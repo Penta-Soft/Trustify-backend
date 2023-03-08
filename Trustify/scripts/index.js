@@ -1,4 +1,4 @@
-var ethers = require('ethers');
+const ethers = require('ethers');
 
 module.exports = async function main (callback) {
     try {
