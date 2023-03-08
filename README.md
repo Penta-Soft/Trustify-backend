@@ -6,5 +6,8 @@ Vi consiglio di leggervi la guida [QUI](https://docs.openzeppelin.com/learn/deve
 Scaricare [Ganache](https://trufflesuite.com/ganache/)
 Dopo aver scaricato tutto i comandi principali sono:
 
-- npx truffle migrate --network development (per uploddare lo smart contract(Tulliocoin) e per uploddare quello che tiene le recensioni(Trustify o ReviewHolder))
+- `npx truffle migrate --f 1 --to 1 --network development` (per uploddare lo smart contract Tulliocoin)
+- copiare l'address di TullioCoin e incollarlo nello smart contract Trustify.sol, l'address lo trovate o su Ganache o sulla console di VSCode
+- `npx truffle migrate --f 2 --to 2 --network development` (per uploddare lo smart contract Trustify)
 - il resto lo scriverò dopo
+-
