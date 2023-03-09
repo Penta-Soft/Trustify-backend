@@ -8,4 +8,5 @@ Dopo aver scaricato tutto i comandi principali sono:
 
 - per prima cosa andate sulla cartella di Trustify con cd/Trustify
 - `npx truffle migrate --network development` (per uploddare lo smart contract Tulliocoin e lo smart contract ReviewHolder)
-- il resto lo scriverò dopo
+- `npx truffle test` (per verificare che i test funzionino)
+- Da aggiornare
