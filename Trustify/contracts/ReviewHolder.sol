@@ -17,17 +17,25 @@ contract ReviewHolder {
         bool havePayed;
     }
 
+    // MAPPING STUFF
     struct Company {
         address[] allReviewedAddress;
         mapping(address => Review) reviewMap;
     }
 
+    struct Customer {
+        address[] allReviewedCompany;
+        mapping(address => Review) reviewMap;
+    }
+
     mapping(address => Company) companyMap;
+    mapping(address => Customer) customerMap;
 
     constructor(address coinAddress) {
         token = IERC20(coinAddress);
     }
 
+    //TRANSACTION STUFF
     function CheckTranslaction(
         address companyWalletAddress
     ) private view returns (bool) {
@@ -38,6 +46,24 @@ contract ReviewHolder {
         }
     }
 
+    modifier CheckAllowance(uint amount) {
+        require(token.allowance(msg.sender, address(this)) >= amount, "Error");
+        _;
+    }
+
+    function DepositTokens(
+        address addressToDeposit,
+        uint _amount
+    ) public CheckAllowance(_amount) {
+        token.transferFrom(msg.sender, addressToDeposit, _amount);
+        companyMap[addressToDeposit].reviewMap[msg.sender] = Review(
+            "",
+            0,
+            true
+        );
+    }
+
+    //REVIEW STUFF
     function WriteAReview(
         address addressToReview,
         string memory review,
@@ -53,6 +79,8 @@ contract ReviewHolder {
         Review memory _review = Review(review, stars, true);
         companyMap[addressToReview].reviewMap[msg.sender] = _review;
         companyMap[addressToReview].allReviewedAddress.push(msg.sender);
+        customerMap[msg.sender].reviewMap[addressToReview] = _review;
+        customerMap[msg.sender].allReviewedCompany.push(addressToReview);
     }
 
     function GetAllCompanyReview(
@@ -70,7 +98,7 @@ contract ReviewHolder {
         return reviews;
     }
 
-    function GetMyReview(
+    function GetSpecificReview(
         address addressReviewed
     ) public view returns (string memory) {
         string memory review = companyMap[addressReviewed]
@@ -83,41 +111,20 @@ contract ReviewHolder {
         return review;
     }
 
-    /*   
-    function GetAllMyReview(
-        address addressReviewed
-    ) public view returns (string[] memory) {
-        string[] memory reviews = new string[]();
-        for (uint i = 0; i < 5; i++) {
-            reviews[i] = reviewHolder[addressReviewed][msg.sender].review;
+    function GetAllMyReview() public view returns (string[] memory) {
+        uint length = customerMap[msg.sender].allReviewedCompany.length;
+        string[] memory reviews = new string[](length);
+
+        for (uint i = 0; i < length; i++) {
+            reviews[i] = customerMap[msg.sender]
+                .reviewMap[customerMap[msg.sender].allReviewedCompany[i]]
+                .review;
         }
+
         return reviews;
     }
 
-*/
-
     function GetStars(address addressReviewed) public view returns (uint8) {
         return companyMap[addressReviewed].reviewMap[msg.sender].stars;
-    }
-
-    modifier CheckAllowance(uint amount) {
-        require(token.allowance(msg.sender, address(this)) >= amount, "Error");
-        _;
-    }
-
-    function CheckAllowanceAddress() public view returns (uint) {
-        return token.allowance(msg.sender, address(this));
-    }
-
-    function DepositTokens(
-        address addressToDeposit,
-        uint _amount
-    ) public CheckAllowance(_amount) {
-        token.transferFrom(msg.sender, addressToDeposit, _amount);
-        companyMap[addressToDeposit].reviewMap[msg.sender] = Review(
-            "",
-            0,
-            true
-        );
     }
 }
