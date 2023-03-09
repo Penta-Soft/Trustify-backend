@@ -12,17 +12,19 @@ module.exports = async function main (callback) {
         const coin = await TullioCoin.deployed();
 
         await coin.drip();
-        console.log(ethers.utils.formatEther((await coin.balanceOf(mainAccount)).toString()));
-        await coin.approve(holder.address, ethers.utils.parseEther("10"));
-        console.log(ethers.utils.formatEther((await holder.CheckAllowanceAddress()).toString()));
-        await holder.DepositTokens(eShopAccount, ethers.utils.parseEther("1"));
-        console.log(ethers.utils.formatEther((await coin.balanceOf(mainAccount)).toString()));
-        console.log(ethers.utils.formatEther((await coin.balanceOf(eShopAccount)).toString()));
+        //console.log(await holder.GetMapLenght());
+
+        //console.log(ethers.utils.formatEther((await coin.balanceOf(mainAccount)).toString()));
+        //await coin.approve(holder.address, ethers.utils.parseEther("10"));
+        //console.log(ethers.utils.formatEther((await holder.CheckAllowanceAddress()).toString()));
+        //await holder.DepositTokens(eShopAccount, ethers.utils.parseEther("1"));
+        //console.log(ethers.utils.formatEther((await coin.balanceOf(mainAccount)).toString()));
+        //console.log(ethers.utils.formatEther((await coin.balanceOf(eShopAccount)).toString()));
 
 
-        await holder.WriteAReview(eShopAccount, "HELOOOOOO", 3);
-        console.log(await holder.GetAReview(eShopAccount));
-        console.log((await holder.GetStars(eShopAccount)).toString());
+        //await holder.WriteAReview(eShopAccount, "HELOOOOOO", 3);
+        //console.log(await holder.GetAReview(eShopAccount));
+        //console.log((await holder.GetStars(eShopAccount)).toString());
 
       callback(0);
     } catch (error) {
