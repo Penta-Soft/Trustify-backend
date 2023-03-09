@@ -19,10 +19,7 @@ contract ReviewHolder {
     //qui tiene nell'address dell'e-shop una recensione con l'address del cliente
     mapping(address => mapping(address => Review)) reviewHolder;
 
-    address private constant coinAddress =
-        0x84Edd24efCE155B327E5ef229494667b66d03ba0;
-
-    constructor() {
+    constructor(address coinAddress) {
         token = IERC20(coinAddress);
     }
 
