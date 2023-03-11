@@ -1,0 +1,24 @@
+{
+  "name": "trustify",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "npx truffle test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.8.2",
+    "chai": "^4.3.7",
+    "ethers": "^6.1.0",
+    "ganache": "^7.7.6",
+    "truffle": "^5.8.0"
+  },
+  "devDependencies": {
+    "solidity-coverage": "^0.8.2"
+  }
+}
