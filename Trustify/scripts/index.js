@@ -11,7 +11,7 @@ module.exports = async function main (callback) {
         const holder = await reviewHolder.deployed();
         const coin = await TullioCoin.deployed();
 
-        await coin.drip();
+        //await coin.drip();
         //console.log(await holder.GetMapLenght());
 
         //console.log(ethers.utils.formatEther((await coin.balanceOf(mainAccount)).toString()));
