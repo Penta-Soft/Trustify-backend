@@ -36,7 +36,7 @@ contract ReviewHolder {
     }
 
     //TRANSACTION STUFF
-    function CheckTranslaction(
+    function CheckTransaction(
         address companyWalletAddress
     ) private view returns (bool) {
         if (companyMap[companyWalletAddress].reviewMap[msg.sender].havePayed) {
@@ -70,7 +70,7 @@ contract ReviewHolder {
         uint8 stars
     ) public {
         require(
-            CheckTranslaction(addressToReview),
+            CheckTransaction(addressToReview),
             "You don't have a translaction from your address to this address"
         );
 
