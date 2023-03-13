@@ -64,6 +64,7 @@ module.exports = {
       network_id: "*",       // Any network (default: none)
      },
   },
+
   plugins: ["solidity-coverage"],
   // Set default mocha options here, use special reporters, etc.
   mocha: {
