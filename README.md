@@ -6,12 +6,7 @@ Vi consiglio di leggervi la guida [QUI](https://docs.openzeppelin.com/learn/deve
 Dopo aver scaricato tutto i comandi principali sono:
 
 - per prima cosa andate sulla cartella di Trustify con `cd/Trustify`
-- `npm update`
-- `npm i @openzeppelin/contracts`
-- `npm i ethers`
-- `npm i chai`
-- `npm i ganache`
-- `npm i truffle`
+- `npm install` (per installare tutto il necessario)
 - `npx truffle test` (per verificare che i test funzionino)
 
 Per compilare i contratti usare:
