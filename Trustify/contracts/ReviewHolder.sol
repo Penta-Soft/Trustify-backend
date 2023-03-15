@@ -38,7 +38,7 @@ contract ReviewHolder {
     //TRANSACTION STUFF
     function CheckTransaction(
         address companyWalletAddress
-    ) private view returns (bool) {
+    ) public view returns (bool) {
         if (companyMap[companyWalletAddress].reviewMap[msg.sender].havePayed) {
             return true;
         } else {
@@ -74,7 +74,10 @@ contract ReviewHolder {
             "You don't have a translaction from your address to this address"
         );
 
-        require(stars > 0 && stars <= 5, "Error, stars must be a value between 0 and 5");
+        require(
+            stars > 0 && stars <= 5,
+            "Error, stars must be a value between 0 and 5"
+        );
 
         Review memory _review = Review(review, stars, true);
         companyMap[addressToReview].reviewMap[msg.sender] = _review;
@@ -129,12 +132,16 @@ contract ReviewHolder {
     }
 
     //funzione per calcolare la media di stelle ottenute da una certa compagnia
-    function GetAverageStars(address addressReviewed) public view returns (uint[] memory) {
+    function GetAverageStars(
+        address addressReviewed
+    ) public view returns (uint[] memory) {
         uint length = companyMap[addressReviewed].allReviewedAddress.length;
 
         uint[] memory stars = new uint[](length);
-        for(uint i = 0; i<length; i++) {
-            stars[i] = companyMap[addressReviewed].reviewMap[companyMap[addressReviewed].allReviewedAddress[i]].stars;
+        for (uint i = 0; i < length; i++) {
+            stars[i] = companyMap[addressReviewed]
+                .reviewMap[companyMap[addressReviewed].allReviewedAddress[i]]
+                .stars;
         }
 
         return stars;
