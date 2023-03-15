@@ -74,7 +74,7 @@ contract ReviewHolder {
             "You don't have a translaction from your address to this address"
         );
 
-        require(stars > 0 && stars <= 5, "Error, stars must be greater than 0");
+        require(stars > 0 && stars <= 5, "Error, stars must be a value between 0 and 5");
 
         Review memory _review = Review(review, stars, true);
         companyMap[addressToReview].reviewMap[msg.sender] = _review;
@@ -126,5 +126,17 @@ contract ReviewHolder {
 
     function GetStars(address addressReviewed) public view returns (uint8) {
         return companyMap[addressReviewed].reviewMap[msg.sender].stars;
+    }
+
+    //funzione per calcolare la media di stelle ottenute da una certa compagnia
+    function GetAverageStars(address addressReviewed) public view returns (uint[] memory) {
+        uint length = companyMap[addressReviewed].allReviewedAddress.length;
+
+        uint[] memory stars = new uint[](length);
+        for(uint i = 0; i<length; i++) {
+            stars[i] = companyMap[addressReviewed].reviewMap[companyMap[addressReviewed].allReviewedAddress[i]].stars;
+        }
+
+        return stars;
     }
 }

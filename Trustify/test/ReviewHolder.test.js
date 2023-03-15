@@ -45,7 +45,7 @@ contract('ReviewHolder', function ([ customerAddress, customerAddress2, customer
     });
 
 
-    it('Try to write a review with no translaction', async function () {
+    it('Try to write a review with no transaction', async function () {
         
         let err = null
 
@@ -118,5 +118,32 @@ contract('ReviewHolder', function ([ customerAddress, customerAddress2, customer
             expect(reviews[i]).to.equal("Test");
         }
     });
+
+    it('Write a review with different account and check if GetAverageStars return the correct average of stars for that specific company', async function () {
+        await coin.drip({from: customerAddress});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
+        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
+        await holder.WriteAReview(ecommerceAddress, "HELOOOOOO", 3, {from: customerAddress});
+
+        await coin.drip({from: customerAddress2});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress2});
+        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress2});
+        await holder.WriteAReview(ecommerceAddress, "HELOOOOOO", 4, {from: customerAddress2});
+
+        await coin.drip({from: customerAddress3});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress3});
+        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress3});
+        await holder.WriteAReview(ecommerceAddress, "HELOOOOOO", 5, {from: customerAddress3});
+
+        let Average = await holder.GetAverageStars(ecommerceAddress);
+
+        let sum = 0;
+        for(let i in Average) {
+            sum = sum + parseInt(Average[i]);
+        }
+        let avg = sum/(Average.length);
+        
+        expect((avg).toString()).to.equal("4");
+    }); 
 
 });
