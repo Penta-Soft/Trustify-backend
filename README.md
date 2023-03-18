@@ -14,4 +14,4 @@ Per compilare i contratti usare:
 
 Se tutto funziona allora sei okey
 Per uploddare lo smart contract in blockchain usare:
-`npx truffle migrate --network development` (per uploddare lo smart contract Tulliocoin e lo smart contract ReviewHolder)
+`npx truffle migrate --network development` (per uploddare lo smart contract Tcoin e lo smart contract ReviewHolder)

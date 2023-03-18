@@ -7,9 +7,9 @@ module.exports = async function main (callback) {
         const eShopAccount = "0x8FB439D137B3454e67C33C6Ff748d33Ef39Dc924";
 
         const reviewHolder = artifacts.require('ReviewHolder');
-        const TullioCoin = artifacts.require('TullioCoin');
+        const TCoin = artifacts.require('TCoin');
         const holder = await reviewHolder.deployed();
-        const coin = await TullioCoin.deployed();
+        const coin = await TCoin.deployed();
 
         //await coin.drip();
         //console.log(await holder.GetMapLenght());

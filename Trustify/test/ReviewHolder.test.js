@@ -2,7 +2,7 @@ const { expect } = require('chai');
 const { ethers } = require('ethers');
 
 const reviewHolder = artifacts.require('ReviewHolder');
-const TullioCoin = artifacts.require('TullioCoin');
+const TCoin = artifacts.require('TCoin');
 
 //customeraddrerss è il primo address della blockchain (quello con index 0) etc etc...
 contract('ReviewHolder', function ([ customerAddress, customerAddress2, customerAddress3, ecommerceAddress, ecommerceAddress2, ecommerceAddress3, ecommerceAddress4, ecommerceAddress5, ecommerceAddress6]) {
@@ -10,11 +10,11 @@ contract('ReviewHolder', function ([ customerAddress, customerAddress2, customer
     let coin;
 
     beforeEach(async function () {
-        coin = await TullioCoin.new();
+        coin = await TCoin.new();
         holder = await reviewHolder.new(coin.address);
     });
 
-    it('Getting ERC20 TullioCoin', async function () {
+    it('Getting ERC20 TCoin', async function () {
         await coin.drip();
 
         expect(ethers.formatEther((await coin.balanceOf(customerAddress)).toString())).to.equal("100000.0");
