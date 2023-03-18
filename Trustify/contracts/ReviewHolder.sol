@@ -2,6 +2,7 @@
 pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /*
 Piccole note: se l'address non esiste in blockchain non si pu√≤ fare il mapping e il contratto resistuisce un errore.
@@ -9,6 +10,8 @@ le map sono automaticamente inizializzate a valori di default, quindi non si pu√
 */
 
 contract ReviewHolder {
+    using SafeERC20 for IERC20;
+
     IERC20 private token;
 
     struct Review {
@@ -55,7 +58,7 @@ contract ReviewHolder {
         address addressToDeposit,
         uint _amount
     ) public CheckAllowance(_amount) {
-        token.transferFrom(msg.sender, addressToDeposit, _amount);
+        token.safeTransferFrom(msg.sender, addressToDeposit, _amount);
         companyMap[addressToDeposit].reviewMap[msg.sender] = Review(
             "",
             0,
