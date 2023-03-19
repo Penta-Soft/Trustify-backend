@@ -3,6 +3,7 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 
 /*
 Piccole note: se l'address non esiste in blockchain non si può fare il mapping e il contratto resistuisce un errore.
@@ -82,59 +83,94 @@ contract ReviewHolder {
             "Error, stars must be a value between 0 and 5"
         );
 
-        Review memory _review = Review(review, stars, true);
-        companyMap[addressToReview].reviewMap[msg.sender] = _review;
-        companyMap[addressToReview].allReviewedAddress.push(msg.sender);
-        customerMap[msg.sender].reviewMap[addressToReview] = _review;
-        customerMap[msg.sender].allReviewedCompany.push(addressToReview);
+        Review memory tmpReview = companyMap[addressToReview].reviewMap[
+            msg.sender
+        ];
+
+        if (tmpReview.stars == 0 && bytes(tmpReview.review).length == 0) {
+            Review memory _review = Review(review, stars, true);
+            companyMap[addressToReview].reviewMap[msg.sender] = _review;
+            companyMap[addressToReview].allReviewedAddress.push(msg.sender);
+            customerMap[msg.sender].reviewMap[addressToReview] = _review;
+            customerMap[msg.sender].allReviewedCompany.push(addressToReview);
+        } else {
+            Review memory _review = Review(review, stars, true);
+            companyMap[addressToReview].reviewMap[msg.sender] = _review;
+            customerMap[msg.sender].reviewMap[addressToReview] = _review;
+        }
     }
 
     function GetAllCompanyReview(
         address companyAddress
-    ) public view returns (string[] memory) {
+    ) public view returns (string[] memory, uint8[] memory) {
         uint length = companyMap[companyAddress].allReviewedAddress.length;
+
+        require(length != 0, "This company has not received any reviews");
+
         string[] memory reviews = new string[](length);
+        uint8[] memory stars = new uint8[](length);
 
         for (uint i = 0; i < length; i++) {
-            reviews[i] = companyMap[companyAddress]
-                .reviewMap[companyMap[companyAddress].allReviewedAddress[i]]
+            Company storage company = companyMap[companyAddress];
+            reviews[i] = company
+                .reviewMap[company.allReviewedAddress[i]]
                 .review;
+            stars[i] = company.reviewMap[company.allReviewedAddress[i]].stars;
         }
 
-        return reviews;
+        return (reviews, stars);
     }
 
     function GetSpecificReview(
         address addressReviewed
-    ) public view returns (string memory) {
+    ) public view returns (string memory, uint8) {
+        uint8 stars = GetSpecificStars(addressReviewed);
+        require(
+            stars != 0,
+            "You have not released any reviews to this address"
+        );
         string memory review = companyMap[addressReviewed]
             .reviewMap[msg.sender]
             .review;
-        if (bytes(review).length == 0) {
-            return "No review";
-        }
 
-        return review;
+        /*
+        if (bytes(review).length == 0) {
+            return ("No review", 0);
+        }
+        */
+        return (review, stars);
     }
 
-    function GetAllMyReview() public view returns (string[] memory) {
+    function GetAllMyReview()
+        public
+        view
+        returns (string[] memory, uint8[] memory, address[] memory)
+    {
         uint length = customerMap[msg.sender].allReviewedCompany.length;
+        require(length != 0, "You have not released any reviews: length = ");
+
         string[] memory reviews = new string[](length);
+        uint8[] memory stars = new uint8[](length);
+        address[] memory addresses = new address[](length);
 
         for (uint i = 0; i < length; i++) {
-            reviews[i] = customerMap[msg.sender]
-                .reviewMap[customerMap[msg.sender].allReviewedCompany[i]]
+            Customer storage customer = customerMap[msg.sender];
+            reviews[i] = customer
+                .reviewMap[customer.allReviewedCompany[i]]
                 .review;
+            stars[i] = customer.reviewMap[customer.allReviewedCompany[i]].stars;
+            addresses[i] = customer.allReviewedCompany[i];
         }
 
-        return reviews;
+        return (reviews, stars, addresses);
     }
 
-    function GetStars(address addressReviewed) public view returns (uint8) {
+    function GetSpecificStars(
+        address addressReviewed
+    ) private view returns (uint8) {
         return companyMap[addressReviewed].reviewMap[msg.sender].stars;
     }
 
-    //funzione per calcolare la media di stelle ottenute da una certa compagnia
     function GetAverageStars(
         address addressReviewed
     ) public view returns (uint[] memory) {
