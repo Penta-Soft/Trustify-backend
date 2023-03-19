@@ -8,7 +8,7 @@ const TCoin = artifacts.require('TCoin');
 
 //--------------------------------------------------------- TEST DI SISTEMA ---------------------------------------------------------//
 
-contract('Trustify', function ([ customerAddress, customerAddress2, customerAddress3, ecommerceAddress, ecommerceAddress2, ecommerceAddress3, ecommerceAddress4, ecommerceAddress5, ecommerceAddress6]) {
+contract('Trustify-system-test', function ([ customerAddress, customerAddress2, customerAddress3, ecommerceAddress, ecommerceAddress2, ecommerceAddress3, ecommerceAddress4, ecommerceAddress5, ecommerceAddress6]) {
     let holder;
     let coin;
 
