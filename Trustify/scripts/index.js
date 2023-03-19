@@ -6,9 +6,9 @@ module.exports = async function main (callback) {
         const mainAccount = "0x37613F7Ad1e1Facae764448749ca794DCFCC1B9d";
         const eShopAccount = "0x8FB439D137B3454e67C33C6Ff748d33Ef39Dc924";
 
-        const reviewHolder = artifacts.require('ReviewHolder');
+        const Trustify = artifacts.require('Trustify');
         const TCoin = artifacts.require('TCoin');
-        const holder = await reviewHolder.deployed();
+        const holder = await Trustify.deployed();
         const coin = await TCoin.deployed();
 
         //await coin.drip();

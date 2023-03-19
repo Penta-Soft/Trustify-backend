@@ -1,5 +1,5 @@
 const TCoin = artifacts.require("TCoin");
-const trustify = artifacts.require("ReviewHolder");
+const trustify = artifacts.require("Trustify");
 
 module.exports = async function(deployer) {
     await deployer.deploy(TCoin);

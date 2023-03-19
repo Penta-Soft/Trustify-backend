@@ -10,7 +10,7 @@ Piccole note: se l'address non esiste in blockchain non si può fare il mapping 
 le map sono automaticamente inizializzate a valori di default, quindi non si può fare il check se esiste un mapping o no, ma bisogna fare come è satto fatto sotto.
 */
 
-contract ReviewHolder {
+contract Trustify {
     using SafeERC20 for IERC20;
 
     IERC20 private token;
@@ -68,6 +68,11 @@ contract ReviewHolder {
     }
 
     //REVIEW STUFF
+    /*
+        La funzione che scrive la review si accorge se l'utente ha già scritto una review per quella 
+        azienda (guarda se le stelle sono a 0, valore impossibile da mettere al di fuori dal contratto),
+        in tal caso sovrascrive la vecchia review con la nuova, altrimenti crea una nuova review.
+    */
     function WriteAReview(
         address addressToReview,
         string memory review,
