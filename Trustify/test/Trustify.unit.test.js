@@ -6,9 +6,9 @@ const TCoin = artifacts.require('TCoin');
 
 //customeraddrerss è il primo address della blockchain (quello con index 0) etc etc...
 
-//--------------------------------------------------------- TEST DI SISTEMA ---------------------------------------------------------//
-/*
-contract('Trustify-system-test', function ([ customerAddress, customerAddress2, customerAddress3, ecommerceAddress, ecommerceAddress2, ecommerceAddress3, ecommerceAddress4, ecommerceAddress5, ecommerceAddress6]) {
+//--------------------------------------------------------- TEST DI UNITA' ---------------------------------------------------------//
+
+contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, customerAddress3, ecommerceAddress, ecommerceAddress2, ecommerceAddress3, ecommerceAddress4, ecommerceAddress5, ecommerceAddress6, ecommerceAddress7, ecommerceAddress8, ecommerceAddress9, ecommerceAddress10]) {
     let holder;
     let coin;
 
@@ -17,8 +17,7 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
         holder = await Trustify.new(coin.address);
     });
 
-
-    it('Deposit token ERC20 to an address', async function () {
+    it('Deposit ERC20 token', async function () {
         await coin.drip();
         await coin.approve(holder.address, ethers.parseEther("100"));
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"));
@@ -26,6 +25,18 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
 
         expect(ethers.formatEther((await coin.balanceOf(customerAddress)).toString())).to.equal("99900.0");
         expect(ethers.formatEther((await coin.balanceOf(ecommerceAddress)).toString())).to.equal("100.0");
+    });
+
+    it('Trying to deposit ERC20 token without having it', async function () {
+        await coin.approve(holder.address, ethers.parseEther("100"));
+        
+        let err = null
+        try {
+            await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"));
+        } catch (error) {
+            err = error
+        }
+        assert.ok(err instanceof Error)
     });
 
     it('Write a valid review', async function () {
@@ -43,14 +54,25 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
     it('Ask for a non existing review', async function () {
         let err = null
         try {
-            await holder.GetSpecificReview(ecommerceAddress)
+            await holder.GetSpecificReview(ecommerceAddress);
         } catch (error) {
             err = error
         }
         assert.ok(err instanceof Error)
     });
 
-    it('Try to write a review with a wrong n° of star', async function () {
+    it('Try to write a review with no transaction', async function () {    
+        let err = null
+        try {
+            await holder.WriteAReview(ecommerceAddress, "HELOOOOOO", 3);
+        } catch (error) {
+            err = error
+        }
+
+        assert.ok(err instanceof Error)
+    });
+
+    it('Try to write a review with a wrong n° of stars', async function () {
         await coin.drip();
         await coin.approve(holder.address, ethers.parseEther("100"));
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"));
@@ -66,7 +88,7 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
         assert.ok(err instanceof Error)
     });
 
-    it('Try to write an empty review with only the stars', async function () {
+    it('Try to write a review with only the stars', async function () {
         await coin.drip();
         await coin.approve(holder.address, ethers.parseEther("100"));
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"));
@@ -105,7 +127,7 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
         expect(stars[2].toString()).to.equal("1");
     }); 
 
-    it('Write multiple review with one account and check if GetAllMyReview return the array of my reviews ans stars', async function () {
+    it('Write multiple review with one account and check if GetAllMyReview return the array of my reviews and stars', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
@@ -134,18 +156,36 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
         expect(addresses[2]).to.equal(ecommerceAddress3);   
     });
 
-    it("Modify a existing reivew", async function () {
+    it('Modify multiple review with one account and check if GetAllMyReview return the array of my reviews modified and stars', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
-        await holder.WriteAReview(ecommerceAddress, "", 3, {from: customerAddress});
+        await holder.WriteAReview(ecommerceAddress, "CIAOOOO", 3, {from: customerAddress});
 
-        await holder.WriteAReview(ecommerceAddress, "CIAOOOOOO", 2, {from: customerAddress});
+        await coin.drip({from: customerAddress});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
+        await holder.DepositTokens(ecommerceAddress2, ethers.parseEther("100"), {from: customerAddress});
+        await holder.WriteAReview(ecommerceAddress2, "CIAOOOOO", 2, {from: customerAddress});
 
-        const result = await holder.GetSpecificReview(ecommerceAddress);
-        const {0: review, 1: stars} = result;
-        expect(review).to.equal("CIAOOOOOO");
-        expect(stars.toString()).to.equal("2");
+        await coin.drip({from: customerAddress});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
+        await holder.DepositTokens(ecommerceAddress3, ethers.parseEther("100"), {from: customerAddress});
+        await holder.WriteAReview(ecommerceAddress3, "CIAOOOOOO", 1, {from: customerAddress});
+
+        await holder.WriteAReview(ecommerceAddress2, "MODIFIED", 5, {from: customerAddress});
+        await holder.WriteAReview(ecommerceAddress3, "MODIFIED2", 4, {from: customerAddress});
+
+        const result = await holder.GetAllMyReview({from: customerAddress});
+        const {0: review, 1: stars, 2: addresses} = result;
+        expect(review[0]).to.equal("CIAOOOO");
+        expect(review[1]).to.equal("MODIFIED");
+        expect(review[2]).to.equal("MODIFIED2");
+        expect(stars[0].toString()).to.equal("3");
+        expect(stars[1].toString()).to.equal("5");
+        expect(stars[2].toString()).to.equal("4");
+        expect(addresses[0]).to.equal(ecommerceAddress);
+        expect(addresses[1]).to.equal(ecommerceAddress2);
+        expect(addresses[2]).to.equal(ecommerceAddress3);   
     });
 
     it('Write a review with different account and check if GetAverageStars return the correct average of stars for that specific company', async function () {
@@ -175,6 +215,12 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
         expect((avg).toString()).to.equal("4");
     }); 
 
-});
 
-*/
+
+
+
+
+
+    
+
+});

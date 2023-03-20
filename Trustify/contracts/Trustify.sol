@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 /*
 Piccole note: se l'address non esiste in blockchain non si può fare il mapping e il contratto resistuisce un errore.
-le map sono automaticamente inizializzate a valori di default, quindi non si può fare il check se esiste un mapping o no, ma bisogna fare come è satto fatto sotto.
+le map sono automaticamente inizializzate a valori di default, quindi non si può fare il check se esiste un mapping o no, ma bisogna fare come è stato fatto sotto.
 */
 
 contract Trustify {
@@ -42,7 +42,7 @@ contract Trustify {
     //TRANSACTION STUFF
     function CheckTransaction(
         address companyWalletAddress
-    ) public view returns (bool) {
+    ) private view returns (bool) {
         if (companyMap[companyWalletAddress].reviewMap[msg.sender].havePayed) {
             return true;
         } else {

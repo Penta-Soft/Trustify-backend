@@ -7,9 +7,8 @@ const TCoin = artifacts.require('TCoin');
 //customeraddrerss è il primo address della blockchain (quello con index 0) etc etc...
 
 //--------------------------------------------------------- TEST DI UNITA' ---------------------------------------------------------//
-
+/*
 contract('TCoin-unit-test', function ([ customerAddress, customerAddress2, customerAddress3, ecommerceAddress, ecommerceAddress2, ecommerceAddress3, ecommerceAddress4, ecommerceAddress5, ecommerceAddress6]) {
-    let holder;
     let coin;
 
     beforeEach(async function () {
@@ -24,3 +23,5 @@ contract('TCoin-unit-test', function ([ customerAddress, customerAddress2, custo
     });
 
 });
+
+*/
