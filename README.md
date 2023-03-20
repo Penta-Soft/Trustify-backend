@@ -23,3 +23,7 @@ Per urilizzare slither bisogna avere python installato con il path aggiornato al
 
 - `pip3 install slither-analyzer` per installare
 - `slither .` per runnare l'analisi statica
+
+##Code coverage
+Vi sconsigllio di farla perchè ci mette tipo 10 minuti
+- `npx truffle run coverage`
