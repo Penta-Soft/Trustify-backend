@@ -51,7 +51,10 @@ contract Trustify {
     }
 
     modifier CheckAllowance(uint amount) {
-        require(token.allowance(msg.sender, address(this)) >= amount, "Error");
+        require(
+            token.allowance(msg.sender, address(this)) >= amount,
+            "Error with token allowance"
+        );
         _;
     }
 
@@ -80,7 +83,7 @@ contract Trustify {
     ) public {
         require(
             CheckTransaction(addressToReview),
-            "You don't have a translaction from your address to this address"
+            "You dont have a translaction from your address to this address"
         );
 
         require(
@@ -152,7 +155,7 @@ contract Trustify {
         returns (string[] memory, uint8[] memory, address[] memory)
     {
         uint length = customerMap[msg.sender].allCompanyAddress.length;
-        require(length != 0, "You have not released any reviews: length = ");
+        require(length != 0, "You have not released any reviews");
 
         string[] memory reviews = new string[](length);
         uint8[] memory stars = new uint8[](length);
@@ -180,6 +183,10 @@ contract Trustify {
         address addressReviewed
     ) public view returns (uint[] memory) {
         uint length = companyMap[addressReviewed].allCustomerAddress.length;
+        require(
+            length != 0,
+            "This company has not received any reviews, cannot calculate average stars"
+        );
 
         uint[] memory stars = new uint[](length);
         for (uint i = 0; i < length; i++) {

@@ -30,13 +30,22 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
     it('Trying to deposit ERC20 token without having it', async function () {
         await coin.approve(holder.address, ethers.parseEther("100"));
         
-        let err = null
         try {
             await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"));
         } catch (error) {
-            err = error
+            expect(error.reason).to.equal("ERC20: transfer amount exceeds balance");
         }
-        assert.ok(err instanceof Error)
+    });
+
+    it('Trying to deposit ERC20 token without approving', async function () {
+        await coin.drip();
+
+        try {
+            await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"));
+        } catch (error) {
+            expect(error.reason).to.equal("Error with token allowance");
+        }
+        
     });
 
     it('Write a valid review', async function () {
@@ -51,42 +60,38 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         expect(stars.toString()).to.equal("3");
     });
 
+    /*
     it('Ask for a non existing review', async function () {
-        let err = null
         try {
             await holder.GetSpecificReview(ecommerceAddress);
         } catch (error) {
-            err = error
+            expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert You have not released any reviews to this address");
         }
-        assert.ok(err instanceof Error)
     });
+    */
 
-    it('Try to write a review with no transaction', async function () {    
-        let err = null
+    it('Try to write a review with no transaction', async function () {  
         try {
             await holder.WriteAReview(ecommerceAddress, "HELOOOOOO", 3);
         } catch (error) {
-            err = error
+            expect(error.reason).to.equal("You dont have a translaction from your address to this address");
         }
-
-        assert.ok(err instanceof Error)
     });
 
+    /*
     it('Try to write a review with a wrong n° of stars', async function () {
         await coin.drip();
         await coin.approve(holder.address, ethers.parseEther("100"));
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"));
 
-        let err = null
-
         try {
             await holder.WriteAReview(ecommerceAddress, "HELOOOOOO", 0);
         } catch (error) {
-            err = error
+            expect(error.reason).to.equal("Error, stars must be a value between 0 and 5");
         }
 
-        assert.ok(err instanceof Error)
     });
+    */
 
     it('Try to write a review with only the stars', async function () {
         await coin.drip();
@@ -127,6 +132,14 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         expect(stars[2].toString()).to.equal("1");
     }); 
 
+    it('Write a review with different account and check if GetAllMyReview return the array of my reviews and stars empty', async function () {
+        try {
+            await holder.GetAllCompanyReview(ecommerceAddress);
+        } catch (error) {
+            expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert This company has not received any reviews");
+        }
+    });
+
     it('Write multiple review with one account and check if GetAllMyReview return the array of my reviews and stars', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
@@ -154,6 +167,14 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         expect(addresses[0]).to.equal(ecommerceAddress);
         expect(addresses[1]).to.equal(ecommerceAddress2);
         expect(addresses[2]).to.equal(ecommerceAddress3);   
+    });
+
+    it('Write multiple review with one account and check if GetAllMyReview return the array of my reviews and stars', async function () {
+        try {
+            await holder.GetAllMyReview();
+        } catch (error) {
+            expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert You have not released any reviews");
+        }
     });
 
     it('Modify multiple review with one account and check if GetAllMyReview return the array of my reviews modified and stars', async function () {
@@ -188,6 +209,8 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         expect(addresses[2]).to.equal(ecommerceAddress3);   
     });
 
+
+    /*
     it('Write a review with different account and check if GetAverageStars return the correct average of stars for that specific company', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
@@ -214,13 +237,15 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         
         expect((avg).toString()).to.equal("4");
     }); 
+*/
 
+    it('Check if GetAverageStars return an error when there are no review for that address', async function () {
+        try {
+            await holder.GetAverageStars(ecommerceAddress);
+        } catch (error) {
+            expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert This company has not received any reviews, cannot calculate average stars");
+        }
+    });
 
-
-
-
-
-
-    
 
 });

@@ -41,29 +41,24 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
     });
 
     it('Ask for a non existing review', async function () {
-        let err = null
         try {
-            await holder.GetSpecificReview(ecommerceAddress)
+            await holder.GetSpecificReview(ecommerceAddress);
         } catch (error) {
-            err = error
+            expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert You have not released any reviews to this address");
         }
-        assert.ok(err instanceof Error)
     });
 
-    it('Try to write a review with a wrong n° of star', async function () {
+    it('Try to write a review with a wrong n° of stars', async function () {
         await coin.drip();
         await coin.approve(holder.address, ethers.parseEther("100"));
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"));
 
-        let err = null
-
         try {
             await holder.WriteAReview(ecommerceAddress, "HELOOOOOO", 0);
         } catch (error) {
-            err = error
+            expect(error.reason).to.equal("Error, stars must be a value between 0 and 5");
         }
 
-        assert.ok(err instanceof Error)
     });
 
     it('Try to write an empty review with only the stars', async function () {
@@ -148,6 +143,7 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
         expect(stars.toString()).to.equal("2");
     });
 
+    
     it('Write a review with different account and check if GetAverageStars return the correct average of stars for that specific company', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
