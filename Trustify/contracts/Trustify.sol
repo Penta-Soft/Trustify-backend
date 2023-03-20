@@ -59,12 +59,12 @@ contract Trustify {
         address addressToDeposit,
         uint _amount
     ) public CheckAllowance(_amount) {
-        token.safeTransferFrom(msg.sender, addressToDeposit, _amount);
         companyMap[addressToDeposit].reviewMap[msg.sender] = Review(
             "",
             0,
             true
         );
+        token.safeTransferFrom(msg.sender, addressToDeposit, _amount);
     }
 
     //REVIEW STUFF
