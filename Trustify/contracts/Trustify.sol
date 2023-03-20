@@ -23,17 +23,17 @@ contract Trustify {
 
     // MAPPING STUFF
     struct Company {
-        address[] allReviewedAddress;
-        mapping(address => Review) reviewMap;
+        address[] allCustomerAddress; //tiene tutti gli address degli utenti che hanno fatto una review a questa azienda (serve per la funzione che restituisce tutte le review di un'azienda)
+        mapping(address => Review) reviewMap; //map con address di ogni utente e la review che ha fatto a questa azienda
     }
 
     struct Customer {
-        address[] allReviewedCompany;
-        mapping(address => Review) reviewMap;
+        address[] allCompanyAddress; //tiene tutti gli address delle aziende che hanno ricevuto una review da questo utente (serve per la funzione che restituisce tutte le review di un utente)
+        mapping(address => Review) reviewMap; //map con address di ogni azienda/e-shop e la review che ha fatto l'utente
     }
 
-    mapping(address => Company) companyMap;
-    mapping(address => Customer) customerMap;
+    mapping(address => Company) companyMap; //map con address di ogni azienda/e-shop
+    mapping(address => Customer) customerMap; //map con address di ogni utente
 
     constructor(address coinAddress) {
         token = IERC20(coinAddress);
@@ -95,9 +95,9 @@ contract Trustify {
         if (tmpReview.stars == 0 && bytes(tmpReview.review).length == 0) {
             Review memory _review = Review(review, stars, true);
             companyMap[addressToReview].reviewMap[msg.sender] = _review;
-            companyMap[addressToReview].allReviewedAddress.push(msg.sender);
+            companyMap[addressToReview].allCustomerAddress.push(msg.sender);
             customerMap[msg.sender].reviewMap[addressToReview] = _review;
-            customerMap[msg.sender].allReviewedCompany.push(addressToReview);
+            customerMap[msg.sender].allCompanyAddress.push(addressToReview);
         } else {
             Review memory _review = Review(review, stars, true);
             companyMap[addressToReview].reviewMap[msg.sender] = _review;
@@ -108,7 +108,7 @@ contract Trustify {
     function GetAllCompanyReview(
         address companyAddress
     ) public view returns (string[] memory, uint8[] memory) {
-        uint length = companyMap[companyAddress].allReviewedAddress.length;
+        uint length = companyMap[companyAddress].allCustomerAddress.length;
 
         require(length != 0, "This company has not received any reviews");
 
@@ -118,9 +118,9 @@ contract Trustify {
         for (uint i = 0; i < length; i++) {
             Company storage company = companyMap[companyAddress];
             reviews[i] = company
-                .reviewMap[company.allReviewedAddress[i]]
+                .reviewMap[company.allCustomerAddress[i]]
                 .review;
-            stars[i] = company.reviewMap[company.allReviewedAddress[i]].stars;
+            stars[i] = company.reviewMap[company.allCustomerAddress[i]].stars;
         }
 
         return (reviews, stars);
@@ -151,7 +151,7 @@ contract Trustify {
         view
         returns (string[] memory, uint8[] memory, address[] memory)
     {
-        uint length = customerMap[msg.sender].allReviewedCompany.length;
+        uint length = customerMap[msg.sender].allCompanyAddress.length;
         require(length != 0, "You have not released any reviews: length = ");
 
         string[] memory reviews = new string[](length);
@@ -161,10 +161,10 @@ contract Trustify {
         for (uint i = 0; i < length; i++) {
             Customer storage customer = customerMap[msg.sender];
             reviews[i] = customer
-                .reviewMap[customer.allReviewedCompany[i]]
+                .reviewMap[customer.allCompanyAddress[i]]
                 .review;
-            stars[i] = customer.reviewMap[customer.allReviewedCompany[i]].stars;
-            addresses[i] = customer.allReviewedCompany[i];
+            stars[i] = customer.reviewMap[customer.allCompanyAddress[i]].stars;
+            addresses[i] = customer.allCompanyAddress[i];
         }
 
         return (reviews, stars, addresses);
@@ -179,12 +179,12 @@ contract Trustify {
     function GetAverageStars(
         address addressReviewed
     ) public view returns (uint[] memory) {
-        uint length = companyMap[addressReviewed].allReviewedAddress.length;
+        uint length = companyMap[addressReviewed].allCustomerAddress.length;
 
         uint[] memory stars = new uint[](length);
         for (uint i = 0; i < length; i++) {
             stars[i] = companyMap[addressReviewed]
-                .reviewMap[companyMap[addressReviewed].allReviewedAddress[i]]
+                .reviewMap[companyMap[addressReviewed].allCustomerAddress[i]]
                 .stars;
         }
 
