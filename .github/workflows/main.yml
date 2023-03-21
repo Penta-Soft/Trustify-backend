@@ -22,7 +22,7 @@ jobs:
       run: npm --version
       
     - name: Change directory
-      run: cd .\Trustify\
+      run: cd Trustify
     
     - name: Install Truffle
       run: npm install truffle@5.5.22 -g # cannot use truffle@latest due to https://github.com/sc-forks/solidity-coverage/issues/696
