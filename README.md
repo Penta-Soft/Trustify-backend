@@ -7,6 +7,7 @@ Dopo aver scaricato tutto i comandi principali sono:
 
 - per prima cosa andate sulla cartella di Trustify con `cd/Trustify`
 - `npm install` (per installare tutto il necessario)
+- Aprire ganache con `npx ganache`
 - `npx truffle test` (per verificare che i test funzionino)
 
 Per compilare i contratti usare:
