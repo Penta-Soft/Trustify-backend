@@ -29,20 +29,11 @@ jobs:
       working-directory: ./Trustify
       run: npm install
       
-  run-ganache:
-    runs-on: ubuntu-latest
-    needs: [build-and-install]
-    steps:
-    - uses: actions/checkout@v2
-    - name: Start ganache blockchain
-      working-directory: ./Trustify
-      run: ganache-cli -d > /dev/null &
+    - name: Start Ganache
+      uses: ethereumjs/ganache-cli@v7.0.0
+      with:
+        args: -d -p 8545
 
-  run-test:
-    runs-on: ubuntu-latest
-    needs: [build-and-install, run-ganache]
-    steps:    
-    - uses: actions/checkout@v2
-    - name: Run Truffle Test with CI=true for Codechecks 
+    - name: Run Truffle Test 
       working-directory: ./Trustify
       run: npx truffle test
