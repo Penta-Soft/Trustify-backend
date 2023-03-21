@@ -30,9 +30,9 @@ jobs:
       run: npm install
       
     - name: Start Ganache
-      uses: ethereumjs/ganache-cli@v7.0.0
+      uses: nomiclabs/ganache-cli-action@v1.2.0
       with:
-        args: -d -p 8545
+        version: '7.0.0'
 
     - name: Run Truffle Test 
       working-directory: ./Trustify
