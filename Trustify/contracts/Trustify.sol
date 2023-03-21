@@ -108,22 +108,44 @@ contract Trustify {
         }
     }
 
-    function GetAllCompanyReview(
+    function GetNCompanyReview(
+        uint start,
+        uint end,
         address companyAddress
     ) public view returns (string[] memory, uint8[] memory) {
-        uint length = companyMap[companyAddress].allCustomerAddress.length;
+        uint totalLenght = companyMap[companyAddress].allCustomerAddress.length;
+        uint realEnd = end;
+        require(totalLenght > 0, "This company have not received any reviews");
+        totalLenght--;
+        require(
+            start <= totalLenght,
+            "Start must be less than the length of the array"
+        );
+        require(start <= end, "Start number must be less than end");
 
-        require(length != 0, "This company has not received any reviews");
+        /*
+        require(
+            end <= totalLenght,
+            "End must be less than the length of the array"
+        );
+        */
+        if (realEnd > totalLenght) {
+            realEnd = totalLenght;
+        }
 
+        uint length = realEnd - start + 1;
         string[] memory reviews = new string[](length);
         uint8[] memory stars = new uint8[](length);
 
-        for (uint i = 0; i < length; i++) {
+        for (uint i = start; i <= realEnd; i++) {
             Company storage company = companyMap[companyAddress];
-            reviews[i] = company
+            uint index = i - start;
+            reviews[index] = company
                 .reviewMap[company.allCustomerAddress[i]]
                 .review;
-            stars[i] = company.reviewMap[company.allCustomerAddress[i]].stars;
+            stars[index] = company
+                .reviewMap[company.allCustomerAddress[i]]
+                .stars;
         }
 
         return (reviews, stars);
@@ -140,34 +162,49 @@ contract Trustify {
         string memory review = companyMap[addressReviewed]
             .reviewMap[msg.sender]
             .review;
-
-        /*
-        if (bytes(review).length == 0) {
-            return ("No review", 0);
-        }
-        */
         return (review, stars);
     }
 
-    function GetAllMyReview()
-        public
-        view
-        returns (string[] memory, uint8[] memory, address[] memory)
-    {
-        uint length = customerMap[msg.sender].allCompanyAddress.length;
-        require(length != 0, "You have not released any reviews");
+    //This return N review of the user with [start, end] included, start start from 0
+    function GetNMyReview(
+        uint start,
+        uint end
+    ) public view returns (string[] memory, uint8[] memory, address[] memory) {
+        uint totalLenght = customerMap[msg.sender].allCompanyAddress.length;
+        uint realEnd = end;
+        require(totalLenght > 0, "You have not released any reviews");
+        totalLenght--;
+        require(
+            start <= totalLenght,
+            "Start must be less than the length of the array"
+        );
+        require(start <= end, "Start number must be less than end");
 
+        /*
+        require(
+            end <= totalLenght,
+            "End must be less than the length of the array"
+        );
+        */
+        if (realEnd > totalLenght) {
+            realEnd = totalLenght;
+        }
+
+        uint length = realEnd - start + 1;
         string[] memory reviews = new string[](length);
         uint8[] memory stars = new uint8[](length);
         address[] memory addresses = new address[](length);
 
-        for (uint i = 0; i < length; i++) {
+        for (uint i = start; i <= realEnd; i++) {
             Customer storage customer = customerMap[msg.sender];
-            reviews[i] = customer
+            uint index = i - start;
+            reviews[index] = customer
                 .reviewMap[customer.allCompanyAddress[i]]
                 .review;
-            stars[i] = customer.reviewMap[customer.allCompanyAddress[i]].stars;
-            addresses[i] = customer.allCompanyAddress[i];
+            stars[index] = customer
+                .reviewMap[customer.allCompanyAddress[i]]
+                .stars;
+            addresses[index] = customer.allCompanyAddress[i];
         }
 
         return (reviews, stars, addresses);
