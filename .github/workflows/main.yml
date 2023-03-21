@@ -27,7 +27,11 @@ jobs:
     
     - name: Install Truffle Dependencies
       working-directory: ./Trustify
-      run: npm install      
+      run: npm install
+      
+    - name: Start ganache blockchain
+      working-directory: ./Trustify
+      run: npx ganache
     
     - name: Run Truffle Test with CI=true for Codechecks 
       working-directory: ./Trustify
