@@ -33,14 +33,16 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-and-install]
     steps:
+    - uses: actions/checkout@v2
     - name: Start ganache blockchain
-      working-directory: /Trustify
+      working-directory: ./Trustify
       run: npx ganache
       
   run-test:
     runs-on: ubuntu-latest
     needs: [build-and-install, run-ganache]
     steps:    
+    - uses: actions/checkout@v2
     - name: Run Truffle Test with CI=true for Codechecks 
-      working-directory: /Trustify
+      working-directory: ./Trustify
       run: CI=true truffle test
