@@ -22,11 +22,11 @@ jobs:
       run: npm --version
     
     - name: Install Truffle
-      working-directory: ./Trustify
+      working-directory: /Trustify
       run: npm install truffle@5.5.22 -g # cannot use truffle@latest due to https://github.com/sc-forks/solidity-coverage/issues/696
     
     - name: Install Truffle Dependencies
-      working-directory: ./Trustify
+      working-directory: /Trustify
       run: npm install
       
   run-ganache:
@@ -34,7 +34,7 @@ jobs:
     needs: [build-and-install]
     steps:
     - name: Start ganache blockchain
-      working-directory: ./Trustify
+      working-directory: /Trustify
       run: npx ganache
       
   run-test:
@@ -42,5 +42,5 @@ jobs:
     needs: [build-and-install, run-ganache]
     steps:    
     - name: Run Truffle Test with CI=true for Codechecks 
-      working-directory: ./Trustify
+      working-directory: /Trustify
       run: CI=true truffle test
