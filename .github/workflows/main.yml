@@ -36,7 +36,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Start ganache blockchain
       working-directory: ./Trustify
-      run: ganache -d > /dev/null &
+      run: npx ganache -d > /dev/null &
 
 
   run-test:
