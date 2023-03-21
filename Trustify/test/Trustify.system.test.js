@@ -117,6 +117,14 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
         expect((avg).toString()).to.equal("4");
     }); 
 
+    it('Ask for the average of stars of a company without review', async function () {
+        try {
+            await holder.GetAverageStars(ecommerceAddress);
+        } catch (error) {
+            expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert This company has not received any reviews, cannot calculate average stars");
+        }
+    });
+
     it('Write n review and check if GetNMyReview return the last n review', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
@@ -267,6 +275,24 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
             await holder.GetNCompanyReview(2, 0, ecommerceAddress, {from: customerAddress});
         } catch (error) {
             expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert Start must be less than the length of the array");
+        }
+    });
+
+    it('Set a start value > end value for GetNMyReview', async function () {
+        await coin.drip({from: customerAddress});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
+        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
+        await holder.WriteAReview(ecommerceAddress, "HELOOOOOO", 3, {from: customerAddress});
+        
+        await coin.drip({from: customerAddress2});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress2});
+        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress2});
+        await holder.WriteAReview(ecommerceAddress, "HELOOOOOOO", 2, {from: customerAddress2});
+
+        try {
+            await holder.GetNCompanyReview(1, 0, ecommerceAddress, {from: customerAddress});
+        } catch (error) {
+            expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert Start number must be less than end");
         }
     });
 
