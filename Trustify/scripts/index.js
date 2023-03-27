@@ -1,15 +1,15 @@
-const ethers = require('ethers');
+const { ethers } = require('ethers');
 
-module.exports = async function main (callback) {
+module.exports = async function main (callback, wallets) {
     try {
-
-        const mainAccount = "0x37613F7Ad1e1Facae764448749ca794DCFCC1B9d";
-        const eShopAccount = "0x8FB439D137B3454e67C33C6Ff748d33Ef39Dc924";
 
         const Trustify = artifacts.require('Trustify');
         const TCoin = artifacts.require('TCoin');
-        const holder = await Trustify.deployed();
-        const coin = await TCoin.deployed();
+        const tCoin = await artifacts.deploy(TCoin);
+        const trustify = await artifacts.deploy(Trustify, tCoin.address);
+
+        console.log("Trustify wallet" + wallets[0].address);
+
 
         //await coin.drip();
         //console.log(await holder.GetMapLenght());
