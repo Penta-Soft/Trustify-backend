@@ -1,7 +1,6 @@
 const { expect } = require('chai');
 const { ethers } = require('ethers');
 
-const Trustify = artifacts.require('Trustify');
 const TCoin = artifacts.require('TCoin');
 
 //customeraddrerss è il primo address della blockchain (quello con index 0) etc etc...
@@ -13,7 +12,6 @@ contract('TCoin-unit-test', function ([ customerAddress, customerAddress2, custo
 
     beforeEach(async function () {
         coin = await TCoin.new();
-        holder = await Trustify.new(coin.address);
     });
 
     it('Getting ERC20 TCoin token', async function () {
