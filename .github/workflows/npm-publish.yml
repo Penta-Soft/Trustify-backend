@@ -1,19 +1,37 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+name: Truffle Build
 
-name: Testing
-
-on: 
- push:
-    branches:
-      - develop
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
 
 jobs:
-  build:
+  build-and-install:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
+
+      - name: Setup NodeJS 16
+        uses: actions/setup-node@v2
         with:
-          node-version: 16
-      - run: cd Trustify
-      - run: npm install 
+          node-version: 16.x
+      - name: Show NodeJS version
+        run: npm --version
+
+      - name: Install Truffle
+        working-directory: ./Trustify
+        run: npm install truffle@5.5.22 -g # cannot use truffle@latest due to https://github.com/sc-forks/solidity-coverage/issues/696
+
+      - name: Install Truffle Dependencies
+        working-directory: ./Trustify
+        run: npm install
+
+      - name: Install ganache and truffle plugin
+        working-directory: ./Trustify
+        run: npm install https://github.com/lazza89/truffle-ganache-test.git
+
+      - name: Run Truffle Test
+        working-directory: ./Trustify
+        run: npx truffle run ganache-test

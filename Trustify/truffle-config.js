@@ -65,6 +65,7 @@ module.exports = {
      },
   },
   plugins: ["solidity-coverage"],
+  plugins: ['truffle-ganache-test'],
   // Set default mocha options here, use special reporters, etc.
   mocha: {
     // timeout: 100000
