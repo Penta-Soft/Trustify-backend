@@ -40,14 +40,12 @@ contract Trustify {
     }
 
     //TRANSACTION STUFF
-    function CheckTransaction(
-        address companyWalletAddress
-    ) private view returns (bool) {
-        if (companyMap[companyWalletAddress].reviewMap[msg.sender].havePayed) {
-            return true;
-        } else {
-            return false;
-        }
+    modifier CheckTransaction(address companyWalletAddress) {
+        require(
+            companyMap[companyWalletAddress].reviewMap[msg.sender].havePayed,
+            "You dont have a translaction from your address to this address"
+        );
+        _;
     }
 
     modifier CheckAllowance(uint amount) {
@@ -80,12 +78,7 @@ contract Trustify {
         address addressToReview,
         string memory review,
         uint8 stars
-    ) public {
-        require(
-            CheckTransaction(addressToReview),
-            "You dont have a translaction from your address to this address"
-        );
-
+    ) public CheckTransaction(addressToReview) {
         require(
             stars > 0 && stars <= 5,
             "Error, stars must be a value between 0 and 5"
