@@ -114,7 +114,6 @@ contract Trustify {
         address companyAddress
     ) public view returns (string[] memory, uint8[] memory) {
         uint totalLenght = companyMap[companyAddress].allCustomerAddress.length;
-        uint realEnd = end;
         require(totalLenght > 0, "This company have not received any reviews");
         totalLenght--;
         require(
@@ -122,22 +121,17 @@ contract Trustify {
             "Start must be less than the length of the array"
         );
         require(start <= end, "Start number must be less than end");
+        require(end - start <= 25, "You can get max 25 reviews per call");
 
-        /*
-        require(
-            end <= totalLenght,
-            "End must be less than the length of the array"
-        );
-        */
-        if (realEnd > totalLenght) {
-            realEnd = totalLenght;
+        if (end > totalLenght) {
+            end = totalLenght;
         }
 
-        uint length = realEnd - start + 1;
+        uint length = end - start + 1;
         string[] memory reviews = new string[](length);
         uint8[] memory stars = new uint8[](length);
 
-        for (uint i = start; i <= realEnd; i++) {
+        for (uint i = start; i <= end; i++) {
             Company storage company = companyMap[companyAddress];
             uint index = i - start;
             reviews[index] = company
@@ -171,31 +165,26 @@ contract Trustify {
         uint end
     ) public view returns (string[] memory, uint8[] memory, address[] memory) {
         uint totalLenght = customerMap[msg.sender].allCompanyAddress.length;
-        uint realEnd = end;
         require(totalLenght > 0, "You have not released any reviews");
         totalLenght--;
         require(
             start <= totalLenght,
             "Start must be less than the length of the array"
         );
-        require(start <= end, "Start number must be less than end");
 
-        /*
-        require(
-            end <= totalLenght,
-            "End must be less than the length of the array"
-        );
-        */
-        if (realEnd > totalLenght) {
-            realEnd = totalLenght;
+        require(start <= end, "Start number must be less than end");
+        require(end - start <= 25, "You can get max 25 reviews per call");
+
+        if (end > totalLenght) {
+            end = totalLenght;
         }
 
-        uint length = realEnd - start + 1;
+        uint length = end - start + 1;
         string[] memory reviews = new string[](length);
         uint8[] memory stars = new uint8[](length);
         address[] memory addresses = new address[](length);
 
-        for (uint i = start; i <= realEnd; i++) {
+        for (uint i = start; i <= end; i++) {
             Customer storage customer = customerMap[msg.sender];
             uint index = i - start;
             reviews[index] = customer

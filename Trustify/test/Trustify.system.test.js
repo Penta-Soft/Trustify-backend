@@ -208,7 +208,7 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
         await holder.DepositTokens(ecommerceAddress3, ethers.parseEther("100"), {from: customerAddress});
         await holder.WriteAReview(ecommerceAddress3, "HELOOOOOOOO", 1, {from: customerAddress});
 
-        const result = await holder.GetNMyReview(0, 100,{from: customerAddress});
+        const result = await holder.GetNMyReview(0, 25,{from: customerAddress});
         const {0: review, 1: stars, 2: addresses} = result;
 
         expect(review[0]).to.equal("HELOOOOOO");
@@ -312,7 +312,7 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress3});
         await holder.WriteAReview(ecommerceAddress, "HELOOOOOOOO", 1, {from: customerAddress3});
 
-        const result = await holder.GetNCompanyReview(0, 100, ecommerceAddress, {from: customerAddress});
+        const result = await holder.GetNCompanyReview(0, 25, ecommerceAddress, {from: customerAddress});
         const {0: review, 1: stars} = result;
 
         expect(review[0]).to.equal("HELOOOOOO");
@@ -321,6 +321,54 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
         expect(stars[0].toString()).to.equal("3");
         expect(stars[1].toString()).to.equal("2");
         expect(stars[2].toString()).to.equal("1");
+
+    });
+
+    it('Write N review and ask for more than 25 review for GetNMyReview', async function () {
+        await coin.drip({from: customerAddress});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
+        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
+        await holder.WriteAReview(ecommerceAddress, "HELOOOOOO", 3, {from: customerAddress});
+        
+        await coin.drip({from: customerAddress2});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress2});
+        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress2});
+        await holder.WriteAReview(ecommerceAddress, "HELOOOOOOO", 2, {from: customerAddress2});
+
+        await coin.drip({from: customerAddress3});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress3});
+        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress3});
+        await holder.WriteAReview(ecommerceAddress, "HELOOOOOOOO", 1, {from: customerAddress3});
+
+        try {
+            await holder.GetNMyReview(0, 26, {from: customerAddress});
+        } catch (error) {
+            expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert You can get max 25 reviews per call");
+        }
+
+    });
+
+    it('Write N review and ask for more than 25 review for GetNCompanyReview', async function () {
+        await coin.drip({from: customerAddress});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
+        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
+        await holder.WriteAReview(ecommerceAddress, "HELOOOOOO", 3, {from: customerAddress});
+        
+        await coin.drip({from: customerAddress2});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress2});
+        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress2});
+        await holder.WriteAReview(ecommerceAddress, "HELOOOOOOO", 2, {from: customerAddress2});
+
+        await coin.drip({from: customerAddress3});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress3});
+        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress3});
+        await holder.WriteAReview(ecommerceAddress, "HELOOOOOOOO", 1, {from: customerAddress3});
+
+        try {
+            await holder.GetNCompanyReview(0, 26, ecommerceAddress, {from: customerAddress});
+        } catch (error) {
+            expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert You can get max 25 reviews per call");
+        }
 
     });
 
