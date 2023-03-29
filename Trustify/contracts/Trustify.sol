@@ -141,7 +141,7 @@ contract Trustify {
     function GetSpecificReview(
         address addressReviewed
     ) public view returns (string memory, uint8) {
-        uint8 stars = GetSpecificStars(addressReviewed);
+        uint8 stars = companyMap[addressReviewed].reviewMap[msg.sender].stars;
         require(
             stars != 0,
             "You have not released any reviews to this address"
@@ -190,12 +190,6 @@ contract Trustify {
         }
 
         return (reviews, stars, addresses);
-    }
-
-    function GetSpecificStars(
-        address addressReviewed
-    ) private view returns (uint8) {
-        return companyMap[addressReviewed].reviewMap[msg.sender].stars;
     }
 
     function GetAverageStars(
