@@ -105,8 +105,6 @@ contract Trustify {
         uint allCustomerAddressSize = companyMap[addressToReview].allCustomerAddress.length;
         uint allCompanyAddressSize = customerMap[msg.sender].allCompanyAddress.length;
 
-        unchecked {
-
         require(
             allCustomerAddressSize > 0,
             "Error, you don't have review to delete"
@@ -165,8 +163,7 @@ contract Trustify {
         );
 
         return true;
-
-        }
+  
     }
 
 
