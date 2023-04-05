@@ -158,7 +158,7 @@ contract Trustify {
         }
 
         require(
-            i2 <= allCustomerAddressSize,
+            i2 <= allCompanyAddressSize,
             "Unknow error during deletion of company address review"
         );
 
