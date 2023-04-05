@@ -17,7 +17,36 @@ contract('Trustify-system-test', function ([ customerAddress, customerAddress2, 
         holder = await Trustify.new(coin.address);
     });
 
+    it('Write two valid review and delete it', async function () {
+        await coin.drip({from: customerAddress});
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
+        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
+        await holder.WriteAReview(ecommerceAddress, "HELOOOOOO", 3, {from: customerAddress});
+        
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
+        await holder.DepositTokens(ecommerceAddress2, ethers.parseEther("100"), {from: customerAddress});
+        await holder.WriteAReview(ecommerceAddress2, "HELOOOOOOO", 2, {from: customerAddress});
 
+        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
+        await holder.DepositTokens(ecommerceAddress3, ethers.parseEther("100"), {from: customerAddress});
+        await holder.WriteAReview(ecommerceAddress3, "HELOOOOOOOO", 1, {from: customerAddress});
+
+        await holder.DeleteReview(ecommerceAddress, {from: customerAddress});
+
+
+        const result = await holder.GetNMyReview(0, 10,{from: customerAddress});
+        const {0: review, 1: stars, 2: addresses} = result;
+
+        
+        expect(review[0]).to.equal("HELOOOOOOO");
+        expect(review[1]).to.equal("HELOOOOOOOO");
+        expect(stars[0].toString()).to.equal("2");
+        expect(stars[1].toString()).to.equal("1");
+        expect(addresses[0]).to.equal(ecommerceAddress2);
+        expect(addresses[1]).to.equal(ecommerceAddress3);
+        
+
+    });
 
 
 });

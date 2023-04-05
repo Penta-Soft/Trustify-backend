@@ -101,6 +101,75 @@ contract Trustify {
         }
     }
 
+    function DeleteReview(address addressToReview) public returns (bool) {
+        uint allCustomerAddressSize = companyMap[addressToReview].allCustomerAddress.length;
+        uint allCompanyAddressSize = customerMap[msg.sender].allCompanyAddress.length;
+
+        unchecked {
+
+        require(
+            allCustomerAddressSize > 0,
+            "Error, you don't have review to delete"
+        );
+
+        require(
+            allCompanyAddressSize > 0,
+            "Error, you don't have review to delete"
+        );
+
+        Review memory _review = Review("", 0, true);
+        companyMap[addressToReview].reviewMap[msg.sender] = _review;
+        customerMap[msg.sender].reviewMap[addressToReview] = _review;
+
+        allCustomerAddressSize--;
+        allCompanyAddressSize--;
+
+        uint i = 0;
+        if(allCustomerAddressSize > 0) {
+            for (; i <= allCustomerAddressSize; i++) {
+                if (addressToReview == companyMap[addressToReview].allCustomerAddress[i]) {
+                    for (uint index = i; index < allCustomerAddressSize - 1; index++) {
+                        companyMap[addressToReview].allCustomerAddress[index] = companyMap[addressToReview].allCustomerAddress[index + 1];
+                    }
+                    companyMap[addressToReview].allCustomerAddress.pop();
+                    break;
+                }
+            }
+        }else{
+            companyMap[addressToReview].allCustomerAddress.pop();
+        }
+
+        require(
+            i <= allCustomerAddressSize,
+            "Unknow error during deletion of customer address review"
+        );
+
+        uint i2 = 0;
+        if(allCompanyAddressSize > 0) {
+            for (; i2 <= allCompanyAddressSize; i2++) {
+                if (addressToReview == customerMap[msg.sender].allCompanyAddress[i2]) {
+                    for (uint index = i2; index <= allCompanyAddressSize - 1; index++) {
+                        customerMap[msg.sender].allCompanyAddress[index] = customerMap[msg.sender].allCompanyAddress[index + 1];
+                    }
+                    customerMap[msg.sender].allCompanyAddress.pop();
+                    break;
+                }
+            }
+        }else{
+            customerMap[msg.sender].allCompanyAddress.pop();
+        }
+
+        require(
+            i2 <= allCustomerAddressSize,
+            "Unknow error during deletion of company address review"
+        );
+
+        return true;
+
+        }
+    }
+
+
     function GetNCompanyReview(
         uint start,
         uint end,
