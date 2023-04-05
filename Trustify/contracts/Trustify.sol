@@ -125,8 +125,8 @@ contract Trustify {
         uint i = 0;
         if(allCustomerAddressSize > 0) {
             for (; i <= allCustomerAddressSize; i++) {
-                if (addressToReview == companyMap[addressToReview].allCustomerAddress[i]) {
-                    for (uint index = i; index < allCustomerAddressSize - 1; index++) {
+                if (msg.sender == companyMap[addressToReview].allCustomerAddress[i]) {
+                    for (uint index = i; index <= allCustomerAddressSize - 1; index++) {
                         companyMap[addressToReview].allCustomerAddress[index] = companyMap[addressToReview].allCustomerAddress[index + 1];
                     }
                     companyMap[addressToReview].allCustomerAddress.pop();
