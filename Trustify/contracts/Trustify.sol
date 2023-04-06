@@ -172,33 +172,30 @@ contract Trustify {
         uint end,
         address companyAddress
     ) public view returns (string[] memory, uint8[] memory) {
-        uint totalLenght = companyMap[companyAddress].allCustomerAddress.length;
-        require(totalLenght > 0, "This company have not received any reviews");
-        totalLenght--;
+        uint totalLength = companyMap[companyAddress].allCustomerAddress.length;
+        require(totalLength > 0, "This company have not received any reviews");
+        totalLength--;
         require(
-            start <= totalLenght,
+            start <= totalLength,
             "Start must be less than the length of the array"
         );
         require(start <= end, "Start number must be less than end");
         require(end - start <= 25, "You can get max 25 reviews per call");
 
-        if (end > totalLenght) {
-            end = totalLenght;
+        if (end > totalLength) {
+            end = totalLength;
         }
 
         uint length = end - start + 1;
         string[] memory reviews = new string[](length);
         uint8[] memory stars = new uint8[](length);
 
-        for (uint i = start; i <= end; i++) {
+        uint index = 0;
+        for (uint i = totalLength - start + 1; i >= totalLength - end + 1; i--) {
             Company storage company = companyMap[companyAddress];
-            uint index = i - start;
-            reviews[index] = company
-                .reviewMap[company.allCustomerAddress[i]]
-                .review;
-            stars[index] = company
-                .reviewMap[company.allCustomerAddress[i]]
-                .stars;
+            reviews[index] = company.reviewMap[company.allCustomerAddress[i - 1]].review;
+            stars[index] = company.reviewMap[company.allCustomerAddress[i - 1]].stars;
+            index++;
         }
 
         return (reviews, stars);
@@ -223,19 +220,19 @@ contract Trustify {
         uint start,
         uint end
     ) public view returns (string[] memory, uint8[] memory, address[] memory) {
-        uint totalLenght = customerMap[msg.sender].allCompanyAddress.length;
-        require(totalLenght > 0, "You have not released any reviews");
-        totalLenght--;
+        uint totalLength = customerMap[msg.sender].allCompanyAddress.length;
+        require(totalLength > 0, "You have not released any reviews");
+        totalLength--;
         require(
-            start <= totalLenght,
+            start <= totalLength,
             "Start must be less than the length of the array"
         );
 
         require(start <= end, "Start number must be less than end");
         require(end - start <= 25, "You can get max 25 reviews per call");
 
-        if (end > totalLenght) {
-            end = totalLenght;
+        if (end > totalLength) {
+            end = totalLength;
         }
 
         uint length = end - start + 1;
@@ -243,18 +240,18 @@ contract Trustify {
         uint8[] memory stars = new uint8[](length);
         address[] memory addresses = new address[](length);
 
-        for (uint i = start; i <= end; i++) {
+        uint index = 0;
+        for (uint i = totalLength - start + 1; i >= totalLength - end + 1; i--) {
             Customer storage customer = customerMap[msg.sender];
-            uint index = i - start;
             reviews[index] = customer
-                .reviewMap[customer.allCompanyAddress[i]]
+                .reviewMap[customer.allCompanyAddress[i - 1]]
                 .review;
             stars[index] = customer
-                .reviewMap[customer.allCompanyAddress[i]]
+                .reviewMap[customer.allCompanyAddress[i - 1]]
                 .stars;
-            addresses[index] = customer.allCompanyAddress[i];
+            addresses[index] = customer.allCompanyAddress[i - 1];
+            index++;
         }
-
         return (reviews, stars, addresses);
     }
 
