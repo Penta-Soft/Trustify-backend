@@ -477,8 +477,18 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
             expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert This company have not received any reviews");
         }
 
+    });
+
+    it('Delete a review that does not exist', async function (){
+        try {
+            await holder.DeleteReview(ecommerceAddress, {from: customerAddress});
+        } catch (error) {
+            expect(error.reason).to.equal("Error, you don't have a review to delete");
+        }
 
     });
+
+
 
 
 
