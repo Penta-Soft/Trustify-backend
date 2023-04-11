@@ -105,14 +105,10 @@ contract Trustify {
         uint allCustomerAddressSize = companyMap[addressToReview].allCustomerAddress.length;
         uint allCompanyAddressSize = customerMap[msg.sender].allCompanyAddress.length;
 
+        uint totalSize = allCustomerAddressSize + allCompanyAddressSize;
         require(
-            allCustomerAddressSize > 0,
-            "Error, you don't have review to delete"
-        );
-
-        require(
-            allCompanyAddressSize > 0,
-            "Error, you don't have review to delete"
+            totalSize >= 2,
+            "Error, you don't have a review to delete"
         );
 
         Review memory _review = Review("", 0, true);
