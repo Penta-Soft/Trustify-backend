@@ -16,7 +16,7 @@ contract Trustify {
     IERC20 private token;
 
     struct Review {
-        string review;
+        string text;
         uint8 stars;
         bool havePayed;
     }
@@ -76,7 +76,7 @@ contract Trustify {
     */
     function WriteAReview(
         address addressToReview,
-        string memory review,
+        string memory text,
         uint8 stars
     ) public CheckTransaction(addressToReview) {
         require(
@@ -88,28 +88,29 @@ contract Trustify {
             msg.sender
         ];
 
-        if (tmpReview.stars == 0 && bytes(tmpReview.review).length == 0) {
-            Review memory _review = Review(review, stars, true);
+        if (tmpReview.stars == 0 && bytes(tmpReview.text).length == 0) {
+            Review memory _review = Review(text, stars, true);
             companyMap[addressToReview].reviewMap[msg.sender] = _review;
             companyMap[addressToReview].allCustomerAddress.push(msg.sender);
             customerMap[msg.sender].reviewMap[addressToReview] = _review;
             customerMap[msg.sender].allCompanyAddress.push(addressToReview);
         } else {
-            Review memory _review = Review(review, stars, true);
+            Review memory _review = Review(text, stars, true);
             companyMap[addressToReview].reviewMap[msg.sender] = _review;
             customerMap[msg.sender].reviewMap[addressToReview] = _review;
         }
     }
 
     function DeleteReview(address addressToReview) public returns (bool) {
-        uint allCustomerAddressSize = companyMap[addressToReview].allCustomerAddress.length;
-        uint allCompanyAddressSize = customerMap[msg.sender].allCompanyAddress.length;
+        uint allCustomerAddressSize = companyMap[addressToReview]
+            .allCustomerAddress
+            .length;
+        uint allCompanyAddressSize = customerMap[msg.sender]
+            .allCompanyAddress
+            .length;
 
         uint totalSize = allCustomerAddressSize + allCompanyAddressSize;
-        require(
-            totalSize >= 2,
-            "Error, you don't have a review to delete"
-        );
+        require(totalSize >= 2, "Error, you don't have a review to delete");
 
         Review memory _review = Review("", 0, true);
         companyMap[addressToReview].reviewMap[msg.sender] = _review;
@@ -119,17 +120,28 @@ contract Trustify {
         allCompanyAddressSize--;
 
         uint i = 0;
-        if(allCustomerAddressSize > 0) {
+        if (allCustomerAddressSize > 0) {
             for (; i <= allCustomerAddressSize; i++) {
-                if (msg.sender == companyMap[addressToReview].allCustomerAddress[i]) {
-                    for (uint index = i; index <= allCustomerAddressSize - 1; index++) {
-                        companyMap[addressToReview].allCustomerAddress[index] = companyMap[addressToReview].allCustomerAddress[index + 1];
+                if (
+                    msg.sender ==
+                    companyMap[addressToReview].allCustomerAddress[i]
+                ) {
+                    for (
+                        uint index = i;
+                        index <= allCustomerAddressSize - 1;
+                        index++
+                    ) {
+                        companyMap[addressToReview].allCustomerAddress[
+                            index
+                        ] = companyMap[addressToReview].allCustomerAddress[
+                            index + 1
+                        ];
                     }
                     companyMap[addressToReview].allCustomerAddress.pop();
                     break;
                 }
             }
-        }else{
+        } else {
             companyMap[addressToReview].allCustomerAddress.pop();
         }
 
@@ -139,17 +151,28 @@ contract Trustify {
         );
 
         uint i2 = 0;
-        if(allCompanyAddressSize > 0) {
+        if (allCompanyAddressSize > 0) {
             for (; i2 <= allCompanyAddressSize; i2++) {
-                if (addressToReview == customerMap[msg.sender].allCompanyAddress[i2]) {
-                    for (uint index = i2; index <= allCompanyAddressSize - 1; index++) {
-                        customerMap[msg.sender].allCompanyAddress[index] = customerMap[msg.sender].allCompanyAddress[index + 1];
+                if (
+                    addressToReview ==
+                    customerMap[msg.sender].allCompanyAddress[i2]
+                ) {
+                    for (
+                        uint index = i2;
+                        index <= allCompanyAddressSize - 1;
+                        index++
+                    ) {
+                        customerMap[msg.sender].allCompanyAddress[
+                            index
+                        ] = customerMap[msg.sender].allCompanyAddress[
+                            index + 1
+                        ];
                     }
                     customerMap[msg.sender].allCompanyAddress.pop();
                     break;
                 }
             }
-        }else{
+        } else {
             customerMap[msg.sender].allCompanyAddress.pop();
         }
 
@@ -159,9 +182,7 @@ contract Trustify {
         );
 
         return true;
-  
     }
-
 
     function GetNCompanyReview(
         uint start,
@@ -187,10 +208,18 @@ contract Trustify {
         uint8[] memory stars = new uint8[](length);
 
         uint index = 0;
-        for (uint i = totalLength - start + 1; i >= totalLength - end + 1; i--) {
+        for (
+            uint i = totalLength - start + 1;
+            i >= totalLength - end + 1;
+            i--
+        ) {
             Company storage company = companyMap[companyAddress];
-            reviews[index] = company.reviewMap[company.allCustomerAddress[i - 1]].review;
-            stars[index] = company.reviewMap[company.allCustomerAddress[i - 1]].stars;
+            reviews[index] = company
+                .reviewMap[company.allCustomerAddress[i - 1]]
+                .text;
+            stars[index] = company
+                .reviewMap[company.allCustomerAddress[i - 1]]
+                .stars;
             index++;
         }
 
@@ -205,10 +234,10 @@ contract Trustify {
             stars != 0,
             "You have not released any reviews to this address"
         );
-        string memory review = companyMap[addressReviewed]
+        string memory text = companyMap[addressReviewed]
             .reviewMap[msg.sender]
-            .review;
-        return (review, stars);
+            .text;
+        return (text, stars);
     }
 
     //This return N review of the user with [start, end] included, start start from 0
@@ -237,11 +266,15 @@ contract Trustify {
         address[] memory addresses = new address[](length);
 
         uint index = 0;
-        for (uint i = totalLength - start + 1; i >= totalLength - end + 1; i--) {
+        for (
+            uint i = totalLength - start + 1;
+            i >= totalLength - end + 1;
+            i--
+        ) {
             Customer storage customer = customerMap[msg.sender];
             reviews[index] = customer
                 .reviewMap[customer.allCompanyAddress[i - 1]]
-                .review;
+                .text;
             stars[index] = customer
                 .reviewMap[customer.allCompanyAddress[i - 1]]
                 .stars;
