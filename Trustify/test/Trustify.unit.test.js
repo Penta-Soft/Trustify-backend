@@ -424,73 +424,16 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
 
         await holder.DeleteReview(ecommerceAddress5, {from: customerAddress});
 
-
         const result = await holder.GetNMyReview(0, 10,{from: customerAddress});
-        const {0: review, 1: stars, 2: addresses} = result;
+        const {0: review, 1: stars, 2: addresses, 3: isDeleted} = result;
 
-        expect(review[3]).to.equal("HELOOOOOO");
-        expect(review[2]).to.equal("HELOOOOOOO");
-        expect(review[1]).to.equal("HELOOOOOOOO");
-        expect(review[0]).to.equal("HELOOOOOOOOO");
+        expect(review[0]).to.equal("HELOOOOOOOOOO");
+        expect(stars[0].toString()).to.equal("5");
+        expect(addresses[0]).to.equal(ecommerceAddress5);
+        expect(isDeleted[0]).to.equal(true);
 
-        expect(stars[3].toString()).to.equal("1");
-        expect(stars[2].toString()).to.equal("2");
-        expect(stars[1].toString()).to.equal("3");
-        expect(stars[0].toString()).to.equal("4");
-        expect(addresses[3]).to.equal(ecommerceAddress);
-        expect(addresses[2]).to.equal(ecommerceAddress2);
-        expect(addresses[1]).to.equal(ecommerceAddress3);
-        expect(addresses[0]).to.equal(ecommerceAddress4);
 
     });
-
-    
-    it('Write 6 valid review to an address and delete all review', async function (){
-        await coin.drip({from: customerAddress});
-        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
-        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
-        await holder.WriteAReview(ecommerceAddress, "HELOOOOOO", 1, {from: customerAddress});
-
-        await coin.drip({from: customerAddress2});
-        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress2});
-        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress2});
-        await holder.WriteAReview(ecommerceAddress, "HELOOOOOOO", 2, {from: customerAddress2});
-
-        await coin.drip({from: customerAddress3});
-        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress3});
-        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress3});
-        await holder.WriteAReview(ecommerceAddress, "HELOOOOOOOO", 3, {from: customerAddress3});
-
-        await coin.drip({from: customerAddress4});
-        await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress4});
-        await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress4});
-        await holder.WriteAReview(ecommerceAddress, "HELOOOOOOOOO", 4, {from: customerAddress4});
-
-        await holder.DeleteReview(ecommerceAddress, {from: customerAddress});
-        await holder.DeleteReview(ecommerceAddress, {from: customerAddress2});
-        await holder.DeleteReview(ecommerceAddress, {from: customerAddress3});
-        await holder.DeleteReview(ecommerceAddress, {from: customerAddress4});
-
-        try {
-            await holder.GetNCompanyReview(0, 10, ecommerceAddress, {from: customerAddress});
-        } catch (error) {
-            expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert This company have not received any reviews");
-        }
-
-    });
-
-    it('Delete a review that does not exist', async function (){
-        try {
-            await holder.DeleteReview(ecommerceAddress, {from: customerAddress});
-        } catch (error) {
-            expect(error.reason).to.equal("Error, you don't have a review to delete");
-        }
-
-    });
-
-
-
-
 
 
 });

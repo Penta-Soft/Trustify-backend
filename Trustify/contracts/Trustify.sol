@@ -64,7 +64,8 @@ contract Trustify {
         companyMap[addressToDeposit].reviewMap[msg.sender] = Review(
             "",
             0,
-            true
+            true,
+            false
         );
         token.safeTransferFrom(msg.sender, addressToDeposit, _amount);
     }
@@ -90,19 +91,19 @@ contract Trustify {
         ];
 
         if (tmpReview.stars == 0 && bytes(tmpReview.text).length == 0) {
-            Review memory _review = Review(text, stars, true);
+            Review memory _review = Review(text, stars, true, false);
             companyMap[addressToReview].reviewMap[msg.sender] = _review;
             companyMap[addressToReview].allCustomerAddress.push(msg.sender);
             customerMap[msg.sender].reviewMap[addressToReview] = _review;
             customerMap[msg.sender].allCompanyAddress.push(addressToReview);
         } else {
-            Review memory _review = Review(text, stars, true);
+            Review memory _review = Review(text, stars, true, false);
             companyMap[addressToReview].reviewMap[msg.sender] = _review;
             customerMap[msg.sender].reviewMap[addressToReview] = _review;
         }
     }
 
-    function DeleteReview(address reviewAddress){
+    function DeleteReview(address reviewAddress) public {
         companyMap[reviewAddress].reviewMap[msg.sender].isDeleted = true;
         customerMap[msg.sender].reviewMap[reviewAddress].isDeleted = true;
     }
