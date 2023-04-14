@@ -15,11 +15,13 @@ contract Trustify {
 
     IERC20 private token;
 
+    enum ReviewState {ACTIVE, MODIFIED, DELETED}
+
     struct Review {
         string text;
         uint8 stars;
         bool havePayed;
-        bool isDeleted;
+        ReviewState state;
     }
 
     // MAPPING STUFF
@@ -65,7 +67,7 @@ contract Trustify {
             "",
             0,
             true,
-            false
+            ReviewState.ACTIVE
         );
         token.safeTransferFrom(msg.sender, addressToDeposit, _amount);
     }
@@ -91,21 +93,21 @@ contract Trustify {
         ];
 
         if (tmpReview.stars == 0 && bytes(tmpReview.text).length == 0) {
-            Review memory _review = Review(text, stars, true, false);
+            Review memory _review = Review(text, stars, true, ReviewState.ACTIVE);
             companyMap[addressToReview].reviewMap[msg.sender] = _review;
             companyMap[addressToReview].allCustomerAddress.push(msg.sender);
             customerMap[msg.sender].reviewMap[addressToReview] = _review;
             customerMap[msg.sender].allCompanyAddress.push(addressToReview);
         } else {
-            Review memory _review = Review(text, stars, true, false);
+            Review memory _review = Review(text, stars, true, ReviewState.MODIFIED);
             companyMap[addressToReview].reviewMap[msg.sender] = _review;
             customerMap[msg.sender].reviewMap[addressToReview] = _review;
         }
     }
 
     function DeleteReview(address reviewAddress) public {
-        companyMap[reviewAddress].reviewMap[msg.sender].isDeleted = true;
-        customerMap[msg.sender].reviewMap[reviewAddress].isDeleted = true;
+        companyMap[reviewAddress].reviewMap[msg.sender].state = ReviewState.DELETED;
+        customerMap[msg.sender].reviewMap[reviewAddress].state = ReviewState.DELETED;
     }
 
     /*
@@ -194,11 +196,18 @@ contract Trustify {
 
     */
 
+    function StateToString(ReviewState state) private pure returns (string memory) {
+        if (state == ReviewState.ACTIVE) return "ACTIVE";
+        if (state == ReviewState.MODIFIED) return "MODIFIED";
+        if (state == ReviewState.DELETED) return "DELETED";
+        return "UNKNOWN";
+    }
+
     function GetNCompanyReview(
         uint start,
         uint end,
         address companyAddress
-    ) public view returns (string[] memory, uint8[] memory, bool[] memory) {
+    ) public view returns (string[] memory, uint8[] memory, string[] memory) {
         uint totalLength = companyMap[companyAddress].allCustomerAddress.length;
         require(totalLength > 0, "This company have not received any reviews");
         totalLength--;
@@ -216,7 +225,7 @@ contract Trustify {
         uint length = end - start + 1;
         string[] memory reviews = new string[](length);
         uint8[] memory stars = new uint8[](length);
-        bool[] memory isDeleted = new bool[](length);
+        string[] memory state = new string[](length);
 
         uint index = 0;
         for (
@@ -231,18 +240,17 @@ contract Trustify {
             stars[index] = company
                 .reviewMap[company.allCustomerAddress[i - 1]]
                 .stars;
-            isDeleted[index] = company
-                .reviewMap[company.allCustomerAddress[i - 1]]
-                .isDeleted;
+            state[index] = StateToString(company.reviewMap[company.allCustomerAddress[i - 1]]
+                .state);
             index++;
         }
 
-        return (reviews, stars, isDeleted);
+        return (reviews, stars, state);
     }
 
     function GetSpecificReview(
         address addressReviewed
-    ) public view returns (string memory, uint8) {
+    ) public view returns (string memory, uint8, string memory) {
         uint8 stars = companyMap[addressReviewed].reviewMap[msg.sender].stars;
         require(
             stars != 0,
@@ -251,14 +259,16 @@ contract Trustify {
         string memory text = companyMap[addressReviewed]
             .reviewMap[msg.sender]
             .text;
-        return (text, stars);
+        string memory state = StateToString(companyMap[addressReviewed].reviewMap[msg.sender]
+                .state);
+        return (text, stars, state);
     }
 
     //This return N review of the user with [start, end] included, start start from 0
     function GetNMyReview(
         uint start,
         uint end
-    ) public view returns (string[] memory, uint8[] memory, address[] memory, bool[] memory) {
+    ) public view returns (string[] memory, uint8[] memory, address[] memory, string[] memory) {
         uint totalLength = customerMap[msg.sender].allCompanyAddress.length;
         require(totalLength > 0, "You have not released any reviews");
         totalLength--;
@@ -278,7 +288,7 @@ contract Trustify {
         string[] memory reviews = new string[](length);
         uint8[] memory stars = new uint8[](length);
         address[] memory addresses = new address[](length);
-        bool[] memory isDeleted = new bool[](length);
+        string[] memory state = new string[](length);
 
         uint index = 0;
         for (
@@ -294,12 +304,11 @@ contract Trustify {
                 .reviewMap[customer.allCompanyAddress[i - 1]]
                 .stars;
             addresses[index] = customer.allCompanyAddress[i - 1];
-            isDeleted[index] = customer
-                .reviewMap[customer.allCompanyAddress[i - 1]]
-                .isDeleted;
+            state[index] = StateToString(customer.reviewMap[customer.allCompanyAddress[i - 1]]
+                .state);
             index++;
         }
-        return (reviews, stars, addresses, isDeleted);
+        return (reviews, stars, addresses, state);
     }
 
     function GetAverageStars(

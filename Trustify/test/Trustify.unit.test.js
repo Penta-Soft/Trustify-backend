@@ -55,9 +55,10 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.WriteAReview(ecommerceAddress, "HELOOOOOO", 3);
 
         const result = await holder.GetSpecificReview(ecommerceAddress);
-        const {0: review, 1: stars} = result;
+        const {0: review, 1: stars, 2: state} = result;
         expect(review).to.equal("HELOOOOOO");
         expect(stars.toString()).to.equal("3");
+        expect(state.toString()).to.equal("ACTIVE");
     });
 
 
@@ -112,9 +113,10 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.WriteAReview(ecommerceAddress, "CIAOOOOOO", 2, {from: customerAddress});
 
         const result = await holder.GetSpecificReview(ecommerceAddress);
-        const {0: review, 1: stars} = result;
+        const {0: review, 1: stars, 2: state} = result;
         expect(review).to.equal("CIAOOOOOO");
         expect(stars.toString()).to.equal("2");
+        expect(state.toString()).to.equal("MODIFIED");
     });
 
     it('Write a review with different account and check if GetAverageStars return the correct average of stars for that specific company', async function () {
@@ -430,7 +432,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         expect(review[0]).to.equal("HELOOOOOOOOOO");
         expect(stars[0].toString()).to.equal("5");
         expect(addresses[0]).to.equal(ecommerceAddress5);
-        expect(isDeleted[0]).to.equal(true);
+        expect(isDeleted[0]).to.equal("DELETED");
 
 
     });
