@@ -13,6 +13,8 @@ le map sono automaticamente inizializzate a valori di default, quindi non si pu√
 contract Trustify {
     using SafeERC20 for IERC20;
 
+    uint8 private constant MAX_REVIEW_PER_CALL = 25;
+
     IERC20 private token;
 
     enum ReviewState {
@@ -148,7 +150,14 @@ contract Trustify {
             "Start must be less than the length of the array"
         );
         require(start <= end, "Start number must be less than end");
-        require(end - start <= 25, "You can get max 25 reviews per call");
+        require(
+            end - start <= MAX_REVIEW_PER_CALL,
+            string.concat(
+                "You can get max ",
+                Strings.toString(MAX_REVIEW_PER_CALL),
+                " reviews per call"
+            )
+        );
 
         if (end > totalLength) {
             end = totalLength;
@@ -221,7 +230,14 @@ contract Trustify {
         );
 
         require(start <= end, "Start number must be less than end");
-        require(end - start <= 25, "You can get max 25 reviews per call");
+        require(
+            end - start <= MAX_REVIEW_PER_CALL,
+            string.concat(
+                "You can get max ",
+                Strings.toString(MAX_REVIEW_PER_CALL),
+                " reviews per call"
+            )
+        );
 
         if (end > totalLength) {
             end = totalLength;
