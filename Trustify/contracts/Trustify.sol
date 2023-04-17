@@ -65,12 +65,14 @@ contract Trustify {
             "Error with token allowance"
         );
 
-        companyMap[addressToDeposit].reviewMap[msg.sender] = Review(
-            "",
-            0,
-            true,
-            ReviewState.ACTIVE
-        );
+        if (companyMap[addressToDeposit].reviewMap[msg.sender].stars == 0) {
+            companyMap[addressToDeposit].reviewMap[msg.sender] = Review(
+                "",
+                0,
+                true,
+                ReviewState.ACTIVE
+            );
+        }
         token.safeTransferFrom(msg.sender, addressToDeposit, amount);
     }
 
