@@ -103,8 +103,8 @@ contract Trustify {
         uint8 stars
     )
         public
-        CheckTransaction(addressToReview)
         CheckActionToYourself(addressToReview)
+        CheckTransaction(addressToReview)
     {
         require(
             stars > 0 && stars <= 5,

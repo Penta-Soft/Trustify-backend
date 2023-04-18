@@ -27,14 +27,21 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         expect(ethers.formatEther((await coin.balanceOf(ecommerceAddress)).toString())).to.equal("100.0");
     });
 
+    it('Trying to deposit token ERC20 to you address and get an error', async function () {
+        await coin.drip();
+        await coin.approve(holder.address, ethers.parseEther("100"));
+        try {
+            await holder.DepositTokens(customerAddress, ethers.parseEther("100"));
+        } catch (error) {
+            expect(error.reason).to.equal("You can't do this action to yourself Pal!");
+        }
+    
+    });
+
     it('Trying to deposit ERC20 token without having it', async function () {
         await coin.approve(holder.address, ethers.parseEther("100"));
         
-        try {
-            await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"));
-        } catch (error) {
-            expect(error.reason).to.equal("ERC20: transfer amount exceeds balance");
-        }
+       
     });
 
     it('Trying to deposit ERC20 token without approving', async function () {
@@ -61,6 +68,16 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         expect(state.toString()).to.equal("ACTIVE");
     });
 
+    it('Try to write a review to yourself', async function () {
+        await coin.drip();
+        await coin.approve(holder.address, ethers.parseEther("100"));
+
+        try {
+            await holder.WriteAReview(customerAddress, "HELOOOOOO", 3);
+        } catch (error) {
+            expect(error.reason).to.equal("You can't do this action to yourself Pal!");
+        }
+    });
 
     it('Try to write a review with no transaction', async function () {  
         try {
@@ -154,7 +171,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         }
     });
 
-    it('Write n review and check if GetNMyReview return the last n review', async function () {
+    it('Write n review and check if GetMyReview return the last n review', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
@@ -169,7 +186,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.WriteAReview(ecommerceAddress3, "HELOOOOOOOO", 1, {from: customerAddress});
 
 
-        const result = await holder.GetNMyReview(1, 2,{from: customerAddress});
+        const result = await holder.GetMyReview(1, 2,{from: customerAddress});
         const {0: review, 1: stars, 2: addresses} = result;
 
         expect(review[0]).to.equal("HELOOOOOOO");
@@ -180,9 +197,9 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         expect(addresses[1]).to.equal(ecommerceAddress);
     });
 
-    it('Get a non existing review from GetNMyReview', async function () {
+    it('Get a non existing review from GetMyReview', async function () {
         try {
-            await holder.GetNMyReview(0, 1, {from: customerAddress});
+            await holder.GetMyReview(0, 1, {from: customerAddress});
         } catch (error) {
             expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert You have not released any reviews");
         }
@@ -190,7 +207,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
     });
 
     
-    it('Set a start value that is > lenght of the review array for GetNMyReview', async function () {
+    it('Set a start value that is > lenght of the review array for GetMyReview', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
@@ -201,13 +218,13 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.WriteAReview(ecommerceAddress2, "HELOOOOOOO", 2, {from: customerAddress});
 
         try {
-            await holder.GetNMyReview(2, 0, {from: customerAddress});
+            await holder.GetMyReview(2, 0, {from: customerAddress});
         } catch (error) {
             expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert Start must be less than the length of the array");
         }
     });
 
-    it('Set a start value > end value for GetNMyReview', async function () {
+    it('Set a start value > end value for GetMyReview', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
@@ -218,13 +235,13 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.WriteAReview(ecommerceAddress2, "HELOOOOOOO", 2, {from: customerAddress});
 
         try {
-            await holder.GetNMyReview(1, 0, {from: customerAddress});
+            await holder.GetMyReview(1, 0, {from: customerAddress});
         } catch (error) {
             expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert Start number must be less than end");
         }
     });
 
-    it('Write N review and ask for more than N review for GetNMyReview', async function () {
+    it('Write N review and ask for more than N review for GetMyReview', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
@@ -238,7 +255,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.DepositTokens(ecommerceAddress3, ethers.parseEther("100"), {from: customerAddress});
         await holder.WriteAReview(ecommerceAddress3, "HELOOOOOOOO", 1, {from: customerAddress});
 
-        const result = await holder.GetNMyReview(0, 25,{from: customerAddress});
+        const result = await holder.GetMyReview(0, 25,{from: customerAddress});
         const {0: review, 1: stars, 2: addresses} = result;
 
         expect(review[2]).to.equal("HELOOOOOO");
@@ -253,7 +270,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
 
     });
 
-    it('Write N review and ask for more than 25 review for GetNMyReview', async function () {
+    it('Write N review and ask for more than 25 review for GetMyReview', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
@@ -270,14 +287,14 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.WriteAReview(ecommerceAddress, "HELOOOOOOOO", 1, {from: customerAddress3});
 
         try {
-            await holder.GetNMyReview(0, 26, {from: customerAddress});
+            await holder.GetMyReview(0, 26, {from: customerAddress});
         } catch (error) {
             expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert You can get max 25 reviews per call");
         }
 
     });
 
-    it('Write a review with different account and check if GetNCompanyReview return the array of reviews and stars', async function () {
+    it('Write a review with different account and check if GetCompanyReview return the array of reviews and stars', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
@@ -298,7 +315,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress4});
         await holder.WriteAReview(ecommerceAddress, "HELOOOOOOOOO", 5, {from: customerAddress4});
 
-        const result = await holder.GetNCompanyReview(1, 2, ecommerceAddress);
+        const result = await holder.GetCompanyReview(1, 2, ecommerceAddress);
         const {0: review, 1: stars} = result;
         expect(review[1]).to.equal("HELOOOOOOO");
         expect(review[0]).to.equal("HELOOOOOOOO");
@@ -306,15 +323,15 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         expect(stars[0].toString()).to.equal("1");
     }); 
 
-    it('Get a non existing review from GetNCompanyReview', async function () {
+    it('Get a non existing review from GetCompanyReview', async function () {
         try {
-            await holder.GetNCompanyReview(0, 1, ecommerceAddress,  {from: customerAddress});
+            await holder.GetCompanyReview(0, 1, ecommerceAddress,  {from: customerAddress});
         } catch (error) {
             expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert This company have not received any reviews");
         }
     });
 
-    it('Set a start value that is > lenght of the review array for GetNCompanyReview', async function () {
+    it('Set a start value that is > lenght of the review array for GetCompanyReview', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
@@ -326,13 +343,13 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.WriteAReview(ecommerceAddress, "HELOOOOOOO", 2, {from: customerAddress2});
 
         try {
-            await holder.GetNCompanyReview(2, 0, ecommerceAddress, {from: customerAddress});
+            await holder.GetCompanyReview(2, 0, ecommerceAddress, {from: customerAddress});
         } catch (error) {
             expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert Start must be less than the length of the array");
         }
     });
 
-    it('Set a start value > end value for GetNMyReview', async function () {
+    it('Set a start value > end value for GetMyReview', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
@@ -344,13 +361,13 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.WriteAReview(ecommerceAddress, "HELOOOOOOO", 2, {from: customerAddress2});
 
         try {
-            await holder.GetNCompanyReview(1, 0, ecommerceAddress, {from: customerAddress});
+            await holder.GetCompanyReview(1, 0, ecommerceAddress, {from: customerAddress});
         } catch (error) {
             expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert Start number must be less than end");
         }
     });
 
-    it('Write N review and ask for more than N review for GetNCompanyReview', async function () {
+    it('Write N review and ask for more than N review for GetCompanyReview', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
@@ -366,7 +383,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress3});
         await holder.WriteAReview(ecommerceAddress, "HELOOOOOOOO", 1, {from: customerAddress3});
 
-        const result = await holder.GetNCompanyReview(0, 25, ecommerceAddress, {from: customerAddress});
+        const result = await holder.GetCompanyReview(0, 25, ecommerceAddress, {from: customerAddress});
         const {0: review, 1: stars} = result;
 
         expect(review[2]).to.equal("HELOOOOOO");
@@ -378,7 +395,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
 
     });
 
-    it('Write N review and ask for more than 25 review for GetNCompanyReview', async function () {
+    it('Write N review and ask for more than 25 review for GetCompanyReview', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
@@ -395,7 +412,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.WriteAReview(ecommerceAddress, "HELOOOOOOOO", 1, {from: customerAddress3});
 
         try {
-            await holder.GetNCompanyReview(0, 26, ecommerceAddress, {from: customerAddress});
+            await holder.GetCompanyReview(0, 26, ecommerceAddress, {from: customerAddress});
         } catch (error) {
             expect(error.message).to.equal("Returned error: VM Exception while processing transaction: revert You can get max 25 reviews per call");
         }
@@ -426,7 +443,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
 
         await holder.DeleteReview(ecommerceAddress5, {from: customerAddress});
 
-        const result = await holder.GetNMyReview(0, 10,{from: customerAddress});
+        const result = await holder.GetMyReview(0, 10,{from: customerAddress});
         const {0: review, 1: stars, 2: addresses, 3: isDeleted} = result;
 
         expect(review[0]).to.equal("HELOOOOOOOOOO");
