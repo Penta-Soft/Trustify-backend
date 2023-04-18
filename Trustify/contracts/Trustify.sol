@@ -68,6 +68,11 @@ contract Trustify {
             "Error with token allowance"
         );
 
+        require(
+            addressToDeposit != msg.sender,
+            "Error with address, you cant deposit to yourself man!"
+        );
+
         if (companyMap[addressToDeposit].reviewMap[msg.sender].stars == 0) {
             companyMap[addressToDeposit].reviewMap[msg.sender] = Review(
                 "",
