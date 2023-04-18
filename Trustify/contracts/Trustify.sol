@@ -238,8 +238,8 @@ contract Trustify {
         returns (
             string[] memory,
             uint8[] memory,
-            address[] memory,
-            string[] memory
+            string[] memory,
+            address[] memory
         )
     {
         uint totalLength = customerMap[msg.sender].allCompanyAddress.length;
@@ -267,8 +267,8 @@ contract Trustify {
         uint length = end - start + 1;
         string[] memory reviews = new string[](length);
         uint8[] memory stars = new uint8[](length);
-        address[] memory addresses = new address[](length);
         string[] memory state = new string[](length);
+        address[] memory addresses = new address[](length);
 
         uint index = 0;
         for (
@@ -283,13 +283,13 @@ contract Trustify {
             stars[index] = customer
                 .reviewMap[customer.allCompanyAddress[i - 1]]
                 .stars;
-            addresses[index] = customer.allCompanyAddress[i - 1];
             state[index] = StateToString(
                 customer.reviewMap[customer.allCompanyAddress[i - 1]].state
             );
+            addresses[index] = customer.allCompanyAddress[i - 1];
             index++;
         }
-        return (reviews, stars, addresses, state);
+        return (reviews, stars, state, addresses);
     }
 
     function GetAverageStars(

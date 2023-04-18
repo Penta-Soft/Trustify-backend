@@ -187,7 +187,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
 
 
         const result = await holder.GetMyReview(1, 2,{from: customerAddress});
-        const {0: review, 1: stars, 2: addresses} = result;
+        const {0: review, 1: stars, 2: satate, 3: addresses} = result;
 
         expect(review[0]).to.equal("HELOOOOOOO");
         expect(review[1]).to.equal("HELOOOOOO");
@@ -256,7 +256,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.WriteAReview(ecommerceAddress3, "HELOOOOOOOO", 1, {from: customerAddress});
 
         const result = await holder.GetMyReview(0, 25,{from: customerAddress});
-        const {0: review, 1: stars, 2: addresses} = result;
+        const {0: review, 1: stars, 2: state, 3: addresses} = result;
 
         expect(review[2]).to.equal("HELOOOOOO");
         expect(review[1]).to.equal("HELOOOOOOO");
@@ -349,7 +349,7 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         }
     });
 
-    it('Set a start value > end value for GetMyReview', async function () {
+    it('Set a start value > end value for GetCompanyReview', async function () {
         await coin.drip({from: customerAddress});
         await coin.approve(holder.address, ethers.parseEther("100"), {from: customerAddress});
         await holder.DepositTokens(ecommerceAddress, ethers.parseEther("100"), {from: customerAddress});
@@ -444,12 +444,12 @@ contract('Trustify-unit-test', function ([ customerAddress, customerAddress2, cu
         await holder.DeleteReview(ecommerceAddress5, {from: customerAddress});
 
         const result = await holder.GetMyReview(0, 10,{from: customerAddress});
-        const {0: review, 1: stars, 2: addresses, 3: isDeleted} = result;
+        const {0: review, 1: stars, 2: state, 3: addresses} = result;
 
         expect(review[0]).to.equal("HELOOOOOOOOOO");
         expect(stars[0].toString()).to.equal("5");
+        expect(state[0]).to.equal("DELETED");
         expect(addresses[0]).to.equal(ecommerceAddress5);
-        expect(isDeleted[0]).to.equal("DELETED");
 
 
     });
