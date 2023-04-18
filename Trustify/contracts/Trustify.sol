@@ -62,15 +62,21 @@ contract Trustify {
         return token.allowance(msg.sender, address(this));
     }
 
-    function DepositTokens(address addressToDeposit, uint amount) public {
+    modifier CheckActionToYourself(address yourAddress) {
+        require(
+            yourAddress != msg.sender,
+            "You can't do this action to yourself Pal!"
+        );
+        _;
+    }
+
+    function DepositTokens(
+        address addressToDeposit,
+        uint amount
+    ) public CheckActionToYourself(addressToDeposit) {
         require(
             token.allowance(msg.sender, address(this)) >= amount,
             "Error with token allowance"
-        );
-
-        require(
-            addressToDeposit != msg.sender,
-            "Error with address, you cant deposit to yourself man!"
         );
 
         if (companyMap[addressToDeposit].reviewMap[msg.sender].stars == 0) {
@@ -95,7 +101,11 @@ contract Trustify {
         address addressToReview,
         string memory text,
         uint8 stars
-    ) public CheckTransaction(addressToReview) {
+    )
+        public
+        CheckTransaction(addressToReview)
+        CheckActionToYourself(addressToReview)
+    {
         require(
             stars > 0 && stars <= 5,
             "Error, stars must be a value between 0 and 5"
@@ -128,7 +138,9 @@ contract Trustify {
         }
     }
 
-    function DeleteReview(address reviewAddress) public {
+    function DeleteReview(
+        address reviewAddress
+    ) public CheckActionToYourself(reviewAddress) {
         companyMap[reviewAddress].reviewMap[msg.sender].state = ReviewState
             .DELETED;
         customerMap[msg.sender].reviewMap[reviewAddress].state = ReviewState
