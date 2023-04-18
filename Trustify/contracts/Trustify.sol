@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 
 /*
 Piccole note: se l'address non esiste in blockchain non si può fare il mapping e il contratto resistuisce un errore.
-le map sono automaticamente inizializzate a valori di default, quindi non si può fare il check se esiste un mapping o no, ma bisogna fare come è stato fatto sotto.
+le map sono automaticamente inizializzate a valori di default, quindi non si può fare il check se esiste un mapping o no.
 */
 
 contract Trustify {
@@ -48,7 +48,8 @@ contract Trustify {
         token = IERC20(coinAddress);
     }
 
-    //TRANSACTION STUFF
+    //------------------ TRANSACTION STUFF -------------------------------------------------------------------------------
+
     modifier CheckTransaction(address companyWalletAddress) {
         require(
             companyMap[companyWalletAddress].reviewMap[msg.sender].havePayed,
@@ -78,7 +79,8 @@ contract Trustify {
         token.safeTransferFrom(msg.sender, addressToDeposit, amount);
     }
 
-    //REVIEW STUFF
+    //------------------ REVIEW STUFF ------------------------------------------------------------------------------------
+
     /*
         La funzione che scrive la review si accorge se l'utente ha già scritto una review per quella 
         azienda (guarda se le stelle sono a 0, valore impossibile da mettere al di fuori dal contratto),
@@ -137,7 +139,9 @@ contract Trustify {
         return "UNKNOWN";
     }
 
-    function GetNCompanyReview(
+    //------------------ GETTER REVIEW STUFF ------------------------------------------------------------------------------------
+
+    function GetCompanyReview(
         uint start,
         uint end,
         address companyAddress
@@ -208,7 +212,7 @@ contract Trustify {
     }
 
     //This return N review of the user with [start, end] included, start start from 0
-    function GetNMyReview(
+    function GetMyReview(
         uint start,
         uint end
     )
