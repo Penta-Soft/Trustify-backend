@@ -50,7 +50,7 @@ contract Trustify {
 
     //------------------ TRANSACTION STUFF -------------------------------------------------------------------------------
 
-    modifier CheckTransaction(address companyWalletAddress) {
+    modifier checkTransaction(address companyWalletAddress) {
         require(
             companyMap[companyWalletAddress].reviewMap[msg.sender].havePayed,
             "You dont have a translaction from your address to this address"
@@ -58,11 +58,7 @@ contract Trustify {
         _;
     }
 
-    function CheckAllowance() public view returns (uint) {
-        return token.allowance(msg.sender, address(this));
-    }
-
-    modifier CheckActionToYourself(address yourAddress) {
+    modifier checkActionToYourself(address yourAddress) {
         require(
             yourAddress != msg.sender,
             "You can't do this action to yourself Pal!"
@@ -70,10 +66,10 @@ contract Trustify {
         _;
     }
 
-    function DepositTokens(
+    function depositTokens(
         address addressToDeposit,
         uint amount
-    ) public CheckActionToYourself(addressToDeposit) {
+    ) public checkActionToYourself(addressToDeposit) {
         require(
             token.allowance(msg.sender, address(this)) >= amount,
             "Error with token allowance"
@@ -97,14 +93,14 @@ contract Trustify {
         azienda (guarda se le stelle sono a 0, valore impossibile da mettere al di fuori dal contratto),
         in tal caso sovrascrive la vecchia review con la nuova, altrimenti crea una nuova review.
     */
-    function WriteAReview(
+    function writeAReview(
         address addressToReview,
         string memory text,
         uint8 stars
     )
         public
-        CheckActionToYourself(addressToReview)
-        CheckTransaction(addressToReview)
+        checkActionToYourself(addressToReview)
+        checkTransaction(addressToReview)
     {
         require(
             stars > 0 && stars <= 5,
@@ -138,16 +134,16 @@ contract Trustify {
         }
     }
 
-    function DeleteReview(
+    function deleteReview(
         address reviewAddress
-    ) public CheckActionToYourself(reviewAddress) {
+    ) public checkActionToYourself(reviewAddress) {
         companyMap[reviewAddress].reviewMap[msg.sender].state = ReviewState
             .DELETED;
         customerMap[msg.sender].reviewMap[reviewAddress].state = ReviewState
             .DELETED;
     }
 
-    function StateToString(
+    function stateToString(
         ReviewState state
     ) private pure returns (string memory) {
         if (state == ReviewState.ACTIVE) return "ACTIVE";
@@ -158,7 +154,7 @@ contract Trustify {
 
     //------------------ GETTER REVIEW STUFF ------------------------------------------------------------------------------------
 
-    function GetCompanyReview(
+    function getCompanyReview(
         uint start,
         uint end,
         address companyAddress
@@ -202,7 +198,7 @@ contract Trustify {
             stars[index] = company
                 .reviewMap[company.allCustomerAddress[i - 1]]
                 .stars;
-            state[index] = StateToString(
+            state[index] = stateToString(
                 company.reviewMap[company.allCustomerAddress[i - 1]].state
             );
             index++;
@@ -211,7 +207,7 @@ contract Trustify {
         return (reviews, stars, state);
     }
 
-    function GetSpecificReview(
+    function getSpecificReview(
         address addressReviewed
     ) public view returns (string memory, uint8, string memory) {
         uint8 stars = companyMap[addressReviewed].reviewMap[msg.sender].stars;
@@ -222,14 +218,14 @@ contract Trustify {
         string memory text = companyMap[addressReviewed]
             .reviewMap[msg.sender]
             .text;
-        string memory state = StateToString(
+        string memory state = stateToString(
             companyMap[addressReviewed].reviewMap[msg.sender].state
         );
         return (text, stars, state);
     }
 
     //This return N review of the user with [start, end] included, start start from 0
-    function GetMyReview(
+    function getMyReview(
         uint start,
         uint end
     )
@@ -283,7 +279,7 @@ contract Trustify {
             stars[index] = customer
                 .reviewMap[customer.allCompanyAddress[i - 1]]
                 .stars;
-            state[index] = StateToString(
+            state[index] = stateToString(
                 customer.reviewMap[customer.allCompanyAddress[i - 1]].state
             );
             addresses[index] = customer.allCompanyAddress[i - 1];
@@ -292,7 +288,7 @@ contract Trustify {
         return (reviews, stars, state, addresses);
     }
 
-    function GetAverageStars(
+    function getAverageStars(
         address addressReviewed
     ) public view returns (uint[] memory) {
         uint length = companyMap[addressReviewed].allCustomerAddress.length;
