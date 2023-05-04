@@ -50,6 +50,10 @@ contract Trustify {
 
     //------------------ TRANSACTION STUFF -------------------------------------------------------------------------------
 
+    function havePayed(address companyAddress) public view returns (bool) {
+        return companyMap[companyAddress].reviewMap[msg.sender].havePayed;
+    }
+
     modifier checkTransaction(address companyWalletAddress) {
         require(
             companyMap[companyWalletAddress].reviewMap[msg.sender].havePayed,
