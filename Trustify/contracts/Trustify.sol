@@ -50,8 +50,11 @@ contract Trustify {
 
     //------------------ TRANSACTION STUFF -------------------------------------------------------------------------------
 
-    function havePayed(address companyAddress) public view returns (bool) {
-        return companyMap[companyAddress].reviewMap[msg.sender].havePayed;
+    function havePayed(
+        address myAddress,
+        address companyAddress
+    ) public view returns (bool) {
+        return companyMap[companyAddress].reviewMap[myAddress].havePayed;
     }
 
     modifier checkTransaction(address companyWalletAddress) {
