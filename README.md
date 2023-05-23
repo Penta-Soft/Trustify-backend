@@ -20,7 +20,7 @@ Per uploddare lo smart contract in blockchain usare:
 ## Strumenti di analisi statica
 
 Useremo [slither](https://github.com/crytic/slither)
-Per urilizzare slither bisogna avere python installato con il path aggiornato al cmd (cercate su internet come fare) poi:
+Per utilizzare slither bisogna avere python installato con il path aggiornato al cmd (cercate su internet come fare) poi:
 
 - `pip3 install slither-analyzer` per installare
 - `slither .` per runnare l'analisi statica
