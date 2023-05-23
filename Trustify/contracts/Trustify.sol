@@ -4,8 +4,9 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Trustify {
+contract Trustify is Ownable {
     using SafeERC20 for IERC20;
 
     enum ReviewState {
@@ -300,5 +301,39 @@ contract Trustify {
         }
 
         return stars;
+    }
+
+    function forceAddReview(
+        address addressReviewer,
+        address addressReviewed,
+        string memory text,
+        uint8 stars,
+        string memory state
+    ) public onlyOwner {
+        ReviewState _state = ReviewState.ACTIVE;
+        if (
+            keccak256(abi.encodePacked("ACTIVE")) ==
+            keccak256(abi.encodePacked(state))
+        ) {
+            _state = ReviewState.ACTIVE;
+        } else if (
+            keccak256(abi.encodePacked("MODIFIED")) ==
+            keccak256(abi.encodePacked(state))
+        ) {
+            _state = ReviewState.MODIFIED;
+        } else if (
+            keccak256(abi.encodePacked("DELETED")) ==
+            keccak256(abi.encodePacked(state))
+        ) {
+            _state = ReviewState.DELETED;
+        } else {
+            revert("Invalid state");
+        }
+
+        Review memory _review = Review(text, stars, true, _state);
+        companyMap[addressReviewed].reviewMap[addressReviewer] = _review;
+        companyMap[addressReviewed].allCustomerAddress.push(addressReviewer);
+        customerMap[addressReviewer].reviewMap[addressReviewed] = _review;
+        customerMap[addressReviewer].allCompanyAddress.push(addressReviewed);
     }
 }
