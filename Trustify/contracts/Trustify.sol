@@ -330,10 +330,24 @@ contract Trustify is Ownable {
             revert("Invalid state");
         }
 
-        Review memory _review = Review(text, stars, true, _state);
-        companyMap[addressReviewed].reviewMap[addressReviewer] = _review;
-        companyMap[addressReviewed].allCustomerAddress.push(addressReviewer);
-        customerMap[addressReviewer].reviewMap[addressReviewed] = _review;
-        customerMap[addressReviewer].allCompanyAddress.push(addressReviewed);
+        Review memory tmpReview = companyMap[addressReviewed].reviewMap[
+            addressReviewer
+        ];
+
+        if (tmpReview.stars == 0 && bytes(tmpReview.text).length == 0) {
+            Review memory _review = Review(text, stars, true, _state);
+            companyMap[addressReviewed].reviewMap[addressReviewer] = _review;
+            companyMap[addressReviewed].allCustomerAddress.push(
+                addressReviewer
+            );
+            customerMap[addressReviewer].reviewMap[addressReviewed] = _review;
+            customerMap[addressReviewer].allCompanyAddress.push(
+                addressReviewed
+            );
+        } else {
+            Review memory _review = Review(text, stars, true, _state);
+            companyMap[addressReviewed].reviewMap[addressReviewer] = _review;
+            customerMap[addressReviewer].reviewMap[addressReviewed] = _review;
+        }
     }
 }
