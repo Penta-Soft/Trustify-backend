@@ -5,17 +5,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 
-/*
-Piccole note: se l'address non esiste in blockchain non si può fare il mapping e il contratto resistuisce un errore.
-le map sono automaticamente inizializzate a valori di default, quindi non si può fare il check se esiste un mapping o no.
-*/
-
 contract Trustify {
     using SafeERC20 for IERC20;
-
-    uint8 private constant MAX_REVIEW_PER_CALL = 25;
-
-    IERC20 private token;
 
     enum ReviewState {
         ACTIVE,
@@ -30,7 +21,6 @@ contract Trustify {
         ReviewState state;
     }
 
-    // MAPPING STUFF
     struct Company {
         address[] allCustomerAddress; //tiene tutti gli address degli utenti che hanno fatto una review a questa azienda (serve per la funzione che restituisce tutte le review di un'azienda)
         mapping(address => Review) reviewMap; //map con address di ogni utente e la review che ha fatto a questa azienda
@@ -41,8 +31,11 @@ contract Trustify {
         mapping(address => Review) reviewMap; //map con address di ogni azienda/e-shop e la review che ha fatto l'utente
     }
 
-    mapping(address => Company) companyMap; //map con address di ogni azienda/e-shop
-    mapping(address => Customer) customerMap; //map con address di ogni utente
+    uint8 private constant MAX_REVIEW_PER_CALL = 25;
+    IERC20 private token;
+
+    mapping(address => Company) private companyMap; //map con address di ogni azienda/e-shop
+    mapping(address => Customer) private customerMap; //map con address di ogni utente
 
     constructor(address coinAddress) {
         token = IERC20(coinAddress);
@@ -93,13 +86,8 @@ contract Trustify {
         token.safeTransferFrom(msg.sender, addressToDeposit, amount);
     }
 
-    //------------------ REVIEW STUFF ------------------------------------------------------------------------------------
+    //------------------ REVIEW MODIFIER STUFF ------------------------------------------------------------------------------------
 
-    /*
-        La funzione che scrive la review si accorge se l'utente ha già scritto una review per quella 
-        azienda (guarda se le stelle sono a 0, valore impossibile da mettere al di fuori dal contratto),
-        in tal caso sovrascrive la vecchia review con la nuova, altrimenti crea una nuova review.
-    */
     function writeAReview(
         address addressToReview,
         string memory text,
@@ -159,7 +147,7 @@ contract Trustify {
         return "UNKNOWN";
     }
 
-    //------------------ GETTER REVIEW STUFF ------------------------------------------------------------------------------------
+    //------------------ REVIEW GETTER STUFF ------------------------------------------------------------------------------------
 
     function getCompanyReview(
         uint start,
