@@ -733,5 +733,24 @@ contract(
       expect(state[0]).to.equal("DELETED");
       expect(addresses[0]).to.equal(ecommerceAddress5);
     });
+
+    it("should be able to create a new customer", async function () {
+      await holder.forceAddReview(
+        customerAddress,
+        ecommerceAddress,
+        "HELOOOOOO",
+        3,
+        "ACTIVE",
+        {
+          from: customerAddress,
+        }
+      );
+
+      const result = await holder.getSpecificReview(ecommerceAddress);
+      const { 0: review, 1: stars, 2: state } = result;
+      expect(review).to.equal("HELOOOOOO");
+      expect(stars.toString()).to.equal("3");
+      expect(state.toString()).to.equal("ACTIVE");
+    });
   }
 );
