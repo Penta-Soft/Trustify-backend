@@ -6,18 +6,18 @@ contract TrustifyDataBase is Ownable {
     mapping(address => Company) private companyMap;
     mapping(address => Customer) private customerMap;
 
-    address private contractLogicAddress;
+    address private trustifyLogicAddress;
 
     modifier checkPrivilege(address add) {
         require(
-            add == contractLogicAddress,
+            add == trustifyLogicAddress,
             "You dont have the privilege to write in this database"
         );
         _;
     }
 
     function setContractLogicAddress(address add) public onlyOwner {
-        contractLogicAddress = add;
+        trustifyLogicAddress = add;
     }
 
     function getCompanyMapReview(
@@ -34,6 +34,18 @@ contract TrustifyDataBase is Ownable {
         return customerMap[addressCaller].reviewMap[addressTo];
     }
 
+    function getAllCustomerAddress(
+        address addressTo
+    ) public view returns (address[] memory) {
+        return companyMap[addressTo].allCustomerAddress;
+    }
+
+    function getAllCompanyAddress(
+        address addressTo
+    ) public view returns (address[] memory) {
+        return customerMap[addressTo].allCompanyAddress;
+    }
+
     function writeInCompanyMap(
         Review memory review,
         address addressCaller,
@@ -47,5 +59,20 @@ contract TrustifyDataBase is Ownable {
         address addressFrom
     ) public checkPrivilege(msg.sender) {
         companyMap[addressFrom].allCustomerAddress.push(addressCaller);
+    }
+
+    function writeInCustomerMap(
+        Review memory review,
+        address addressCaller,
+        address addressTo
+    ) public checkPrivilege(msg.sender) {
+        customerMap[addressCaller].reviewMap[addressTo] = review;
+    }
+
+    function pushInCustomerMap(
+        address addressCaller,
+        address addressFrom
+    ) public checkPrivilege(msg.sender) {
+        customerMap[addressCaller].allCompanyAddress.push(addressFrom);
     }
 }
