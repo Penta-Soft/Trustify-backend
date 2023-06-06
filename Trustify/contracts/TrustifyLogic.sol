@@ -80,6 +80,8 @@ contract TrustifyLogic is Ownable {
         token.safeTransferFrom(addressCaller, addressToDeposit, amount);
     }
 
+    //------------------ REVIEW MODIFIER STUFF ------------------------------------------------------------------------------------
+
     function writeAReview(
         address addressCaller,
         address addressToReview,
