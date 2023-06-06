@@ -1,39 +1,18 @@
 pragma solidity ^0.8.17;
 
-import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "./Structs.sol";
 
-contract Trustify is Ownable {
-    enum ReviewState {
-        ACTIVE,
-        MODIFIED,
-        DELETED
-    }
+contract TrustifyDataBase is Ownable {
+    mapping(address => Company) private companyMap;
+    mapping(address => Customer) private customerMap;
 
-    struct Review {
-        string text;
-        uint8 stars;
-        bool havePayed;
-        ReviewState state;
-    }
-
-    struct Company {
-        address[] allCustomerAddress;
-        mapping(address => Review) reviewMap;
-    }
-
-    struct Customer {
-        address[] allCompanyAddress;
-        mapping(address => Review) reviewMap;
-    }
-
-    mapping(address => Company) public companyMap;
-    mapping(address => Customer) public customerMap;
-
-    address private contractLogicAddress = "";
+    address private contractLogicAddress;
 
     modifier checkPrivilege(address add) {
-        require(add == contractLogicAddress, "You dont have the privilege");
+        require(
+            add == contractLogicAddress,
+            "You dont have the privilege to write in this database"
+        );
         _;
     }
 
@@ -41,5 +20,32 @@ contract Trustify is Ownable {
         contractLogicAddress = add;
     }
 
-    function 
+    function getCompanyMapReview(
+        address addressCaller,
+        address addressTo
+    ) public view returns (Review memory) {
+        return companyMap[addressTo].reviewMap[addressCaller];
+    }
+
+    function getCustomerMapReview(
+        address addressCaller,
+        address addressTo
+    ) public view returns (Review memory) {
+        return customerMap[addressCaller].reviewMap[addressTo];
+    }
+
+    function writeInCompanyMap(
+        Review memory review,
+        address addressCaller,
+        address addressTo
+    ) public checkPrivilege(msg.sender) {
+        companyMap[addressTo].reviewMap[addressCaller] = review;
+    }
+
+    function pushInCompanyMap(
+        address addressCaller,
+        address addressFrom
+    ) public checkPrivilege(msg.sender) {
+        companyMap[addressFrom].allCustomerAddress.push(addressCaller);
+    }
 }

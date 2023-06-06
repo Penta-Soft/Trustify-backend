@@ -1,29 +1,29 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.17;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/utils/Strings.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "./TrustifyLogic.sol";
 
 contract Trustify {
     TrustifyLogic private trustifyLogic;
 
-    constructor(address coinAddress) {
-        trustifyLogic = new trustifyLogic(coinAddress);
+    constructor(address tLogicAddress) {
+        trustifyLogic = TrustifyLogic(tLogicAddress);
     }
 
     //------------------ TRANSACTION STUFF -------------------------------------------------------------------------------
 
-    function havePayed(address myAddress, address companyAddress) public view returns (bool) {
+    function havePayed(
+        address myAddress,
+        address companyAddress
+    ) public view returns (bool) {
         return trustifyLogic.havePayed(myAddress, companyAddress);
     }
 
     function depositTokens(address addressToDeposit, uint amount) public {
-        trustifyLogic.depositTokens(addressToDeposit, amount);
+        trustifyLogic.depositTokens(msg.sender, addressToDeposit, amount);
     }
 
+    /*
     //------------------ REVIEW MODIFIER STUFF ------------------------------------------------------------------------------------
 
     function writeAReview(address addressToReview, string memory text, uint8 stars) public {
@@ -55,4 +55,5 @@ contract Trustify {
     function forceAddReview(address addressReviewer, address addressReviewed, string memory text, uint8 stars, string memory state) public onlyOwner {
         trustifyLogic.forceAddReview(addressReviewer, addressReviewed, text, stars, state);
     }
+    */
 }
