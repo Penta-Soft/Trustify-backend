@@ -3,10 +3,14 @@ pragma solidity ^0.8.17;
 
 import "./TrustifyLogic.sol";
 
-contract Trustify {
+contract Trustify is Ownable {
     TrustifyLogic private trustifyLogic;
 
     constructor(address tLogicAddress) {
+        trustifyLogic = TrustifyLogic(tLogicAddress);
+    }
+
+    function setTLogicAddress(address tLogicAddress) public onlyOwner {
         trustifyLogic = TrustifyLogic(tLogicAddress);
     }
 

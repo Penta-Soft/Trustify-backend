@@ -15,6 +15,14 @@ contract TrustifyLogic is Ownable {
         trustifyDataBase = TrustifyDataBase(dataBaseAddress);
     }
 
+    function setCoinAddress(address coinAddress) public onlyOwner {
+        token = IERC20(coinAddress);
+    }
+
+    function setDataBaseAddress(address dataBaseAddress) public onlyOwner {
+        trustifyDataBase = TrustifyDataBase(dataBaseAddress);
+    }
+
     struct ReviewReturn {
         string[] reviews;
         uint8[] stars;
